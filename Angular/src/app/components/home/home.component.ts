@@ -1,5 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { DesktopFileManagmentService } from '../../services/desktop-file-managment.service';
+import { DesktopFile } from '../../models/desktop-file';
+import { HomeManagmenetService } from '../../services/home-managmenet.service';
 
 @Component({
   selector: 'app-home',
@@ -7,46 +8,43 @@ import { DesktopFileManagmentService } from '../../services/desktop-file-managme
   styleUrl: './home.component.css'
 })
 export class HomeComponent implements OnInit {
-
-  private desktopFileManagmentService: DesktopFileManagmentService = inject(DesktopFileManagmentService);
-
-  get desktopFiles() {
-    return this.desktopFileManagmentService.desktopFiles;
-  }
-
-  get currentFolderPath() {
-    return this.desktopFileManagmentService.currentFolderPath;
-  }
-
-  get all() {
-    return this.desktopFileManagmentService.all;
-  }
-
-  get sortingMode() {
-    return this.desktopFileManagmentService.sortingMode;
-  }
-
-  get ascending() {
-    return this.desktopFileManagmentService.ascending;
-  }
+  
+  public service: HomeManagmenetService = inject(HomeManagmenetService);
 
   ngOnInit() {
-    this.desktopFileManagmentService.httpGetDesktopFiles();
+    this.service.getDesktopFiles();
   }
 
   onClickGetDesktopFiles(all: boolean) {
-    this.desktopFileManagmentService.all = all;
-    this.desktopFileManagmentService.httpGetDesktopFiles();
+    this.service.all = all;
+    this.service.getDesktopFiles();
   }
 
   onClickSorting(option: number) {
-    if (this.desktopFileManagmentService.sortingMode != option) {
-      this.desktopFileManagmentService.sortingMode = option;
-      this.desktopFileManagmentService.ascending = true;
+    if (this.service.sortingMode != option) {
+      this.service.sortingMode = option;
+      this.service.ascending = true;
     } else {
-      this.desktopFileManagmentService.ascending = !this.desktopFileManagmentService.ascending;
+      this.service.ascending = !this.service.ascending;
     }
 
-    this.desktopFileManagmentService.sortDesktopFiles();
+    this.service.sortDesktopFiles();
+  }
+
+  onClickTableRow(desktopFile: DesktopFile) {
+    if (desktopFile.type === 'Folder') {
+      this.service.currentFolderPath = desktopFile.absolutePath;
+      this.service.getDesktopFiles();
+    } else {
+      this.service.openDesktopFile(desktopFile.absolutePath);
+    }
+  }
+
+  onChangeCurrentFolderPath() {
+    this.service.getDesktopFiles();
+  }
+
+  onClickRefresh() {
+    this.service.getDesktopFiles();
   }
 }

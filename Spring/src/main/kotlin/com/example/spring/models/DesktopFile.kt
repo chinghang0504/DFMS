@@ -4,5 +4,6 @@ data class DesktopFile(
 
     val name: String,
     val type: String,
-    val size: Long
+    val size: Long,
+    val absolutePath: String
 )

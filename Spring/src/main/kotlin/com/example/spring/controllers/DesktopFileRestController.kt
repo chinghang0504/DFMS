@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import java.awt.Desktop
 import java.io.File
 import java.net.URLDecoder
 
@@ -15,7 +16,7 @@ import java.net.URLDecoder
 class DesktopFileRestController {
 
     @GetMapping("/httpGetDesktopFiles")
-    fun httpGetDesktopFiles(@RequestParam path: String?, @RequestParam all: Boolean): ResponseEntity<DesktopFilePackage> {
+    fun httpGetDesktopFiles(@RequestParam path: String, @RequestParam all: Boolean): ResponseEntity<DesktopFilePackage> {
         val initialFolder: File = File(URLDecoder.decode(path))
         if (!initialFolder.exists()) {
             return ResponseEntity
@@ -45,9 +46,9 @@ class DesktopFileRestController {
     private fun getCurrentDesktopFiles(parentFolder: File, desktopFiles: ArrayList<DesktopFile>) {
         parentFolder.listFiles()?.forEach {
             if (it.isDirectory) {
-                desktopFiles.add(DesktopFile(it.name, "Folder", it.length()))
+                desktopFiles.add(DesktopFile(it.name, "Folder", it.length(), it.absolutePath))
             } else {
-                desktopFiles.add(DesktopFile(it.name, "File", it.length()))
+                desktopFiles.add(DesktopFile(it.name, it.extension, it.length(), it.absolutePath))
             }
         }
     }
@@ -57,8 +58,17 @@ class DesktopFileRestController {
             if (it.isDirectory) {
                 getAllDesktopFiles(it, desktopFiles)
             } else {
-                desktopFiles.add(DesktopFile(it.name, "File", it.length()))
+                desktopFiles.add(DesktopFile(it.name, it.extension, it.length(), it.absolutePath))
             }
         }
+    }
+
+    @GetMapping("/httpOpenDesktopFile")
+    fun httpOpenDesktopFile(@RequestParam path: String): ResponseEntity<String> {
+        Desktop.getDesktop().open(File(path))
+        return ResponseEntity
+            .status(HttpStatus.ACCEPTED)
+            .header("Access-Control-Allow-Origin", "*")
+            .body("Open")
     }
 }
