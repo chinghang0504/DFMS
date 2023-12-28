@@ -1,0 +1,25 @@
+<h3>Home</h3>
+<p>Folder: {{ currentFolderPath }}</p>
+<div>
+    <p>File Options:</p>
+    <button class="btn btn-success" (click)="onClickGetDesktopFiles(false)" [disabled]="!all">Current Files</button>
+    <button class="btn btn-success" (click)="onClickGetDesktopFiles(true)" [disabled]="all">All Files</button>
+</div>
+<table class="table">
+    <thead>
+        <tr>
+            <th style="width: 80%;">Name</th>
+            <th style="width: 10%;">Type</th>
+            <th style="width: 10%;">Size</th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (desktopFile of desktopFiles; track $index) {
+        <tr>
+            <td>{{ desktopFile.name }}</td>
+            <td>{{ desktopFile.type }}</td>
+            <td>{{ desktopFile.size }}</td>
+        </tr>
+        }
+    </tbody>
+</table>
