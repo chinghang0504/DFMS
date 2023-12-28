@@ -1,16 +1,28 @@
 <h3>Home</h3>
 <p>Folder: {{ currentFolderPath }}</p>
 <div>
-    <p>File Options:</p>
+    <h6>File Options:</h6>
     <button class="btn btn-success" (click)="onClickGetDesktopFiles(false)" [disabled]="!all">Current Files</button>
     <button class="btn btn-success" (click)="onClickGetDesktopFiles(true)" [disabled]="all">All Files</button>
 </div>
 <table class="table">
     <thead>
         <tr>
-            <th style="width: 80%;">Name</th>
-            <th style="width: 10%;">Type</th>
-            <th style="width: 10%;">Size</th>
+            <th style="width: 70%;" (click)="onClickSorting(0)">
+                Name
+                <i class="bi bi-caret-down-fill" [hidden]="!(sortingMode === 0 && ascending)"></i>
+                <i class="bi bi-caret-up-fill" [hidden]="!(sortingMode === 0 && !ascending)"></i>
+            </th>
+            <th style="width: 15%;" (click)="onClickSorting(1)">
+                Type
+                <i class="bi bi-caret-down-fill" [hidden]="!(sortingMode === 1 && ascending)"></i>
+                <i class="bi bi-caret-up-fill" [hidden]="!(sortingMode === 1 && !ascending)"></i>
+            </th>
+            <th style="width: 15%;" (click)="onClickSorting(2)">
+                Size
+                <i class="bi bi-caret-down-fill" [hidden]="!(sortingMode === 2 && ascending)"></i>
+                <i class="bi bi-caret-up-fill" [hidden]="!(sortingMode === 2 && !ascending)"></i>
+            </th>
         </tr>
     </thead>
     <tbody>

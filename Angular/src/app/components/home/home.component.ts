@@ -22,6 +22,14 @@ export class HomeComponent implements OnInit {
     return this.desktopFileManagmentService.all;
   }
 
+  get sortingMode() {
+    return this.desktopFileManagmentService.sortingMode;
+  }
+
+  get ascending() {
+    return this.desktopFileManagmentService.ascending;
+  }
+
   ngOnInit() {
     this.desktopFileManagmentService.httpGetDesktopFiles();
   }
@@ -29,5 +37,16 @@ export class HomeComponent implements OnInit {
   onClickGetDesktopFiles(all: boolean) {
     this.desktopFileManagmentService.all = all;
     this.desktopFileManagmentService.httpGetDesktopFiles();
+  }
+
+  onClickSorting(option: number) {
+    if (this.desktopFileManagmentService.sortingMode != option) {
+      this.desktopFileManagmentService.sortingMode = option;
+      this.desktopFileManagmentService.ascending = true;
+    } else {
+      this.desktopFileManagmentService.ascending = !this.desktopFileManagmentService.ascending;
+    }
+
+    this.desktopFileManagmentService.sortDesktopFiles();
   }
 }
