@@ -8,7 +8,7 @@ import { HttpService } from './http.service';
 export class HomeManagmenetService {
 
   // File Data
-  currentFolderPath: string = 'C:\\Users\\Ching Hang\\OneDrive\\Library\\Computer Science';
+  currentFolderPath: string;
   desktopFiles: DesktopFile[] = [];
 
   // File Options

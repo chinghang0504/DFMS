@@ -1,18 +1,22 @@
 <h3>Home</h3>
 <div class="form-group mb-2">
-    <label for="">Folder: </label>
+    <label for="">Current Folder: </label>
     <div class="input-group">
-        <input type="text" class="form-control" [(ngModel)]="service.currentFolderPath" (change)="onChangeCurrentFolderPath()">
+        <input type="text" class="form-control" [(ngModel)]="service.currentFolderPath"
+            (change)="onChangeCurrentFolderPath()">
         <div class="input-group-append">
-            <button class="btn btn-outline-secondary" type="button" (click)="onClickRefresh()"><i
-                    class="bi bi-arrow-clockwise"></i></button>
+            <button class="btn btn-outline-secondary" type="button" (click)="onClickRefresh()" title="Refresh">
+                <i class="bi bi-arrow-clockwise"></i>
+            </button>
         </div>
     </div>
 </div>
 <div class="mb-2">
     <h6>File Options:</h6>
-    <button class="btn btn-success" (click)="onClickGetDesktopFiles(false)" [disabled]="!service.all">Current Files</button>
-    <button class="btn btn-success" (click)="onClickGetDesktopFiles(true)" [disabled]="service.all">All Files</button>
+    <button class="btn btn-success" (click)="onClickGetDesktopFiles(false)" [disabled]="!service.all"
+        title="Show folders and files in the current folder">Current Files</button>
+    <button class="btn btn-success" (click)="onClickGetDesktopFiles(true)" [disabled]="service.all"
+        title="Show all files under the current folder">All Files</button>
 </div>
 @if (service.loading) {
 <p>Loading...</p>

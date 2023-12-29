@@ -1,6 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { DesktopFile } from '../../models/desktop-file';
 import { HomeManagmenetService } from '../../services/home-managmenet.service';
+import { SettingsManagementService } from '../../services/settings-management.service';
 
 @Component({
   selector: 'app-home',
@@ -10,8 +11,13 @@ import { HomeManagmenetService } from '../../services/home-managmenet.service';
 export class HomeComponent implements OnInit {
   
   public service: HomeManagmenetService = inject(HomeManagmenetService);
+  private settingsManagementService: SettingsManagementService = inject(SettingsManagementService);
 
   ngOnInit() {
+    if (!this.service.currentFolderPath) {
+      this.settingsManagementService.loadDefaultFolderPath();
+      this.service.currentFolderPath = this.settingsManagementService.defaultFolderPath;
+    }
     this.service.getDesktopFiles();
   }
 
