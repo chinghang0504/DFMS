@@ -46,7 +46,7 @@ class DesktopFileRestController {
     private fun getCurrentDesktopFiles(parentFolder: File, desktopFiles: ArrayList<DesktopFile>) {
         parentFolder.listFiles()?.forEach {
             if (it.isDirectory) {
-                desktopFiles.add(DesktopFile(it.name, "Folder", it.length(), it.absolutePath))
+                desktopFiles.add(DesktopFile(it.name, "folder", it.length(), it.absolutePath))
             } else {
                 desktopFiles.add(DesktopFile(it.name, it.extension, it.length(), it.absolutePath))
             }

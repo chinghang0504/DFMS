@@ -2,6 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { DesktopFile } from '../../models/desktop-file';
 import { HomeManagmenetService } from '../../services/home-managmenet.service';
 import { SettingsManagementService } from '../../services/settings-management.service';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-home',
@@ -9,16 +10,28 @@ import { SettingsManagementService } from '../../services/settings-management.se
   styleUrl: './home.component.css'
 })
 export class HomeComponent implements OnInit {
-  
+
   public service: HomeManagmenetService = inject(HomeManagmenetService);
   private settingsManagementService: SettingsManagementService = inject(SettingsManagementService);
+  private activatedRoute: ActivatedRoute = inject(ActivatedRoute);
+  private router: Router = inject(Router);
 
   ngOnInit() {
     if (!this.service.currentFolderPath) {
       this.settingsManagementService.loadDefaultFolderPath();
       this.service.currentFolderPath = this.settingsManagementService.defaultFolderPath;
     }
-    this.service.getDesktopFiles();
+
+    this.activatedRoute.queryParams.subscribe(
+      (queryParams) => {
+        let queryParamsPath: string = queryParams['path'];
+        if (queryParamsPath == null) {
+          this.navigateSamePage();
+        } else {
+          this.service.currentFolderPath = queryParamsPath;
+          this.service.getDesktopFiles();
+        }
+      });
   }
 
   onClickGetDesktopFiles(all: boolean) {
@@ -38,16 +51,16 @@ export class HomeComponent implements OnInit {
   }
 
   onClickTableRow(desktopFile: DesktopFile) {
-    if (desktopFile.type === 'Folder') {
+    if (desktopFile.type === 'folder') {
       this.service.currentFolderPath = desktopFile.absolutePath;
-      this.service.getDesktopFiles();
+      this.navigateSamePage();
     } else {
       this.service.openDesktopFile(desktopFile.absolutePath);
     }
   }
 
   onChangeCurrentFolderPath() {
-    this.service.getDesktopFiles();
+    this.navigateSamePage();
   }
 
   onClickRefresh() {
@@ -59,17 +72,21 @@ export class HomeComponent implements OnInit {
     if (lastIndex !== -1) {
       this.service.all = false;
       this.service.currentFolderPath = this.service.currentFolderPath.substring(0, lastIndex);
-      this.service.getDesktopFiles();
+      this.navigateSamePage();
     }
   }
 
   onClickDefault() {
     this.service.all = false;
     this.service.currentFolderPath = this.settingsManagementService.defaultFolderPath;
-    this.service.getDesktopFiles();
+    this.navigateSamePage();
   }
 
-  onClickFile() {
-    document.getElementById('file').click();
+  navigateSamePage() {
+    this.router.navigate(['/home'], {
+      queryParams: {
+        'path': this.service.currentFolderPath
+      }
+    });
   }
 }

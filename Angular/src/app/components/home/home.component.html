@@ -4,47 +4,48 @@
     <div class="input-group">
         <input type="text" class="form-control" [(ngModel)]="service.currentFolderPath"
             (change)="onChangeCurrentFolderPath()">
-        <div class="input-group-append">
-            <button class="btn btn-outline-secondary" type="button" (click)="onClickParent()" title="Parent Folder">
-                <i class="bi bi-arrow-90deg-left"></i>
-            </button>
-        </div>
-        <div class="input-group-append">
-            <button class="btn btn-outline-secondary" type="button" (click)="onClickDefault()" title="Default Folder">
-                <i class="bi bi-house"></i>
-            </button>
-        </div>
-        <div class="input-group-append">
-            <button class="btn btn-outline-secondary" type="button" (click)="onClickRefresh()" title="Refresh">
-                <i class="bi bi-arrow-clockwise"></i>
-            </button>
-        </div>
+        <button class="btn btn-outline-secondary" type="button" (click)="onClickParent()" title="Parent Folder">
+            <i class="bi bi-arrow-90deg-left"></i>
+        </button>
+        <button class="btn btn-outline-secondary" type="button" (click)="onClickDefault()" title="Default Folder">
+            <i class="bi bi-house"></i>
+        </button>
+        <button class="btn btn-outline-secondary" type="button" (click)="onClickRefresh()" title="Refresh">
+            <i class="bi bi-arrow-clockwise"></i>
+        </button>
     </div>
 </div>
 <div class="mb-2">
     <h6>File Options:</h6>
-    <button class="btn btn-success" (click)="onClickGetDesktopFiles(false)" [disabled]="!service.all"
-        title="Show folders and files in the current folder">Current Files</button>
-    <button class="btn btn-success" (click)="onClickGetDesktopFiles(true)" [disabled]="service.all"
-        title="Show all files under the current folder">All Files</button>
+    <div class="btn-group" role="group">
+        <button class="btn btn-success" (click)="onClickGetDesktopFiles(false)" [disabled]="!service.all"
+            title="Show folders and files in the current folder">
+            Current Folder
+        </button>
+        <button class="btn btn-success" (click)="onClickGetDesktopFiles(true)" [disabled]="service.all"
+            title="Show all files under the current folder">
+            All Files
+        </button>
+    </div>
 </div>
+
 @if (service.loading) {
 <p>Loading...</p>
 } @else {
 <table class="table table-hover">
     <thead>
         <tr>
-            <th style="width: 70%;" (click)="onClickSorting(0)">
+            <th style="width: 75%;" (click)="onClickSorting(0)">
                 Name
                 <i class="bi bi-caret-down-fill" [hidden]="!(service.sortingMode === 0 && service.ascending)"></i>
                 <i class="bi bi-caret-up-fill" [hidden]="!(service.sortingMode === 0 && !service.ascending)"></i>
             </th>
-            <th style="width: 15%;" (click)="onClickSorting(1)">
+            <th class="text-center" style="width: 10%;" (click)="onClickSorting(1)">
                 Type
                 <i class="bi bi-caret-down-fill" [hidden]="!(service.sortingMode === 1 && service.ascending)"></i>
                 <i class="bi bi-caret-up-fill" [hidden]="!(service.sortingMode === 1 && !service.ascending)"></i>
             </th>
-            <th style="width: 15%;" (click)="onClickSorting(2)">
+            <th class="text-center" style="width: 15%;" (click)="onClickSorting(2)">
                 Size
                 <i class="bi bi-caret-down-fill" [hidden]="!(service.sortingMode === 2 && service.ascending)"></i>
                 <i class="bi bi-caret-up-fill" [hidden]="!(service.sortingMode === 2 && !service.ascending)"></i>
@@ -53,10 +54,10 @@
     </thead>
     <tbody>
         @for (desktopFile of service.desktopFiles; track $index) {
-        <tr (click)="onClickTableRow(desktopFile)" [ngClass]="{ 'table-light': desktopFile.type === 'Folder' }">
+        <tr (click)="onClickTableRow(desktopFile)" [ngClass]="{ 'table-light': desktopFile.type === 'folder' }" title="{{ desktopFile.absolutePath }}">
             <td>{{ desktopFile.name }}</td>
-            <td>{{ desktopFile.type }}</td>
-            <td>{{ desktopFile.size }}</td>
+            <td class="text-center">{{ desktopFile.type }}</td>
+            <td class="text-end">{{ desktopFile.size }}</td>
         </tr>
         }
     </tbody>
