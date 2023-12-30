@@ -5,6 +5,11 @@
         <input type="text" class="form-control" [(ngModel)]="service.currentFolderPath"
             (change)="onChangeCurrentFolderPath()">
         <div class="input-group-append">
+            <button class="btn btn-outline-secondary" type="button" (click)="onClickParent()" title="Parent Folder">
+                <i class="bi bi-arrow-90deg-left"></i>
+            </button>
+        </div>
+        <div class="input-group-append">
             <button class="btn btn-outline-secondary" type="button" (click)="onClickRefresh()" title="Refresh">
                 <i class="bi bi-arrow-clockwise"></i>
             </button>

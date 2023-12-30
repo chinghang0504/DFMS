@@ -53,4 +53,16 @@ export class HomeComponent implements OnInit {
   onClickRefresh() {
     this.service.getDesktopFiles();
   }
+
+  onClickParent() {
+    let lastIndex = this.service.currentFolderPath.lastIndexOf('\\');
+    if (lastIndex !== -1) {
+      this.service.currentFolderPath = this.service.currentFolderPath.substring(0, lastIndex);
+      this.service.getDesktopFiles();
+    }
+  }
+
+  onClickFile() {
+    document.getElementById('file').click();
+  }
 }
