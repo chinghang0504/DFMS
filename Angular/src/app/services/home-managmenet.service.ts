@@ -9,6 +9,7 @@ export class HomeManagmenetService {
 
   // File Data
   currentFolderPath: string;
+  desktopFilesHashCode: number;
   desktopFiles: DesktopFile[] = [];
 
   // File Options
@@ -25,11 +26,20 @@ export class HomeManagmenetService {
 
   getDesktopFiles() {
     this.loading = true;
+
     this.httpService.httpGetDesktopFiles(this.all, this.currentFolderPath)
       .subscribe(
         (res) => {
-          this.desktopFiles = res['desktopFiles'];
-          this.sortDesktopFiles();
+          console.log('Receiving Package...');
+          console.log(res);
+
+          let desktopFilesHashCode = res.desktopFilesHashCode;
+          if (this.desktopFilesHashCode != desktopFilesHashCode) {
+            this.desktopFilesHashCode = desktopFilesHashCode;
+            this.desktopFiles = res.desktopFiles;
+            this.sortDesktopFiles();
+          }
+
           this.loading = false;
         }, (err) => {
           console.log(err);

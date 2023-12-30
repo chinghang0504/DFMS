@@ -22,12 +22,12 @@ class DesktopFileRestController {
             return ResponseEntity
                 .status(Status.FOLDER_DOES_NOT_EXIST.status)
                 .header("Access-Control-Allow-Origin", "*")
-                .body(DesktopFilePackage(Status.FOLDER_DOES_NOT_EXIST.message, null))
+                .body(DesktopFilePackage(Status.FOLDER_DOES_NOT_EXIST.message, null, null))
         } else if (!initialFolder.isDirectory) {
             return ResponseEntity
                 .status(Status.NOT_A_FOLDER.status)
                 .header("Access-Control-Allow-Origin", "*")
-                .body(DesktopFilePackage(Status.NOT_A_FOLDER.message, null))
+                .body(DesktopFilePackage(Status.NOT_A_FOLDER.message, null, null))
         }
 
         val desktopFiles: ArrayList<DesktopFile> = ArrayList()
@@ -40,7 +40,7 @@ class DesktopFileRestController {
         return ResponseEntity
             .status(HttpStatus.ACCEPTED)
             .header("Access-Control-Allow-Origin", "*")
-            .body(DesktopFilePackage(Status.NORMAL.message, desktopFiles))
+            .body(DesktopFilePackage(Status.NORMAL.message, desktopFiles.hashCode(), desktopFiles))
     }
 
     private fun getCurrentDesktopFiles(parentFolder: File, desktopFiles: ArrayList<DesktopFile>) {

@@ -57,6 +57,7 @@ export class HomeComponent implements OnInit {
   onClickParent() {
     let lastIndex = this.service.currentFolderPath.lastIndexOf('\\');
     if (lastIndex !== -1) {
+      this.service.all = false;
       this.service.currentFolderPath = this.service.currentFolderPath.substring(0, lastIndex);
       this.service.getDesktopFiles();
     }
