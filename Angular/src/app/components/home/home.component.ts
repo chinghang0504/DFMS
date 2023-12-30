@@ -63,6 +63,12 @@ export class HomeComponent implements OnInit {
     }
   }
 
+  onClickDefault() {
+    this.service.all = false;
+    this.service.currentFolderPath = this.settingsManagementService.defaultFolderPath;
+    this.service.getDesktopFiles();
+  }
+
   onClickFile() {
     document.getElementById('file').click();
   }
