@@ -10,6 +10,7 @@ import { PageNotFoundComponent } from './components/page-not-found/page-not-foun
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
+import { ByteSizePipe } from './pipes/byte-size.pipe';
 
 @NgModule({
   declarations: [
@@ -18,7 +19,8 @@ import { FormsModule } from '@angular/forms';
     SettingsComponent,
     AboutComponent,
     PageNotFoundComponent,
-    NavbarComponent
+    NavbarComponent,
+    ByteSizePipe
   ],
   imports: [
     BrowserModule,

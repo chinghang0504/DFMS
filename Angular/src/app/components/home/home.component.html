@@ -54,10 +54,11 @@
     </thead>
     <tbody>
         @for (desktopFile of service.desktopFiles; track $index) {
-        <tr (click)="onClickTableRow(desktopFile)" [ngClass]="{ 'table-light': desktopFile.type === 'folder' }" title="{{ desktopFile.absolutePath }}">
+        <tr (click)="onClickTableRow(desktopFile)" [ngClass]="{ 'table-light': desktopFile.type === 'folder' }"
+            title="{{ desktopFile.absolutePath }}">
             <td>{{ desktopFile.name }}</td>
             <td class="text-center">{{ desktopFile.type }}</td>
-            <td class="text-end">{{ desktopFile.size }}</td>
+            <td class="text-end">{{ desktopFile.size | byteSize }}</td>
         </tr>
         }
     </tbody>
