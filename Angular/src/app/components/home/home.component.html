@@ -35,7 +35,7 @@
 <table class="table table-hover">
     <thead>
         <tr>
-            <th style="width: 75%;" (click)="onClickSorting(0)">
+            <th style="width: 80%;" (click)="onClickSorting(0)">
                 Name
                 <i class="bi bi-caret-down-fill" [hidden]="!(service.sortingMode === 0 && service.ascending)"></i>
                 <i class="bi bi-caret-up-fill" [hidden]="!(service.sortingMode === 0 && !service.ascending)"></i>
@@ -45,7 +45,7 @@
                 <i class="bi bi-caret-down-fill" [hidden]="!(service.sortingMode === 1 && service.ascending)"></i>
                 <i class="bi bi-caret-up-fill" [hidden]="!(service.sortingMode === 1 && !service.ascending)"></i>
             </th>
-            <th class="text-center" style="width: 15%;" (click)="onClickSorting(2)">
+            <th class="text-center" style="width: 10%;" (click)="onClickSorting(2)">
                 Size
                 <i class="bi bi-caret-down-fill" [hidden]="!(service.sortingMode === 2 && service.ascending)"></i>
                 <i class="bi bi-caret-up-fill" [hidden]="!(service.sortingMode === 2 && !service.ascending)"></i>

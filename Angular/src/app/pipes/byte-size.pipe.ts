@@ -6,6 +6,6 @@ import { Pipe, PipeTransform } from '@angular/core';
 export class ByteSizePipe implements PipeTransform {
 
   transform(value: number): string {
-    return Math.ceil(value / 1024) + ' KB';
+    return value ? Math.ceil(value / 1024) + ' KB' : '';
   }
 }
