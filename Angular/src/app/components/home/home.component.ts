@@ -12,13 +12,13 @@ import { ActivatedRoute, Router } from '@angular/router';
 export class HomeComponent implements OnInit {
 
   public service: HomeManagmenetService = inject(HomeManagmenetService);
-  private settingsManagementService: SettingsManagementService = inject(SettingsManagementService);
+  public settingsManagementService: SettingsManagementService = inject(SettingsManagementService);
   private activatedRoute: ActivatedRoute = inject(ActivatedRoute);
   private router: Router = inject(Router);
 
   ngOnInit() {
     if (!this.service.currentFolderPath) {
-      this.settingsManagementService.loadDefaultFolderPath();
+      this.settingsManagementService.loadLocalStorage();
       this.service.currentFolderPath = this.settingsManagementService.defaultFolderPath;
     }
 

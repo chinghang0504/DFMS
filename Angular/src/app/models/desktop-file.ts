@@ -4,4 +4,5 @@ export interface DesktopFile {
     type: string;
     size: number;
     absolutePath: string;
+    isHidden: boolean;
 }
