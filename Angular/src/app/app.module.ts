@@ -11,6 +11,7 @@ import { NavbarComponent } from './components/navbar/navbar.component';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { ByteSizePipe } from './pipes/byte-size.pipe';
+import { TwoButtonModalComponent } from './components/two-button-modal/two-button-modal.component';
 
 @NgModule({
   declarations: [
@@ -20,7 +21,8 @@ import { ByteSizePipe } from './pipes/byte-size.pipe';
     AboutComponent,
     PageNotFoundComponent,
     NavbarComponent,
-    ByteSizePipe
+    ByteSizePipe,
+    TwoButtonModalComponent
   ],
   imports: [
     BrowserModule,

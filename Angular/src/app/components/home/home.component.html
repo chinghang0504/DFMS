@@ -1,9 +1,16 @@
 <h3>Home</h3>
+
 <div class="form-group mb-2">
     <label for="">Current Folder: </label>
-    <div class="input-group">
-        <input type="text" class="form-control" [(ngModel)]="service.currentFolderPath"
-            (change)="onChangeCurrentFolderPath()">
+    <div class="input-group dropdown">
+        <input type="text" class="form-control" data-bs-toggle="dropdown" aria-expanded="false"
+            [(ngModel)]="service.currentFolderPath" (change)="onChangeCurrentFolderPath()">
+        <!-- <ul class="dropdown-menu" *ngIf="service.desktopFileTips">
+            @for (tip of service.desktopFileTips; track $index) {
+            <li (click)="onClickTip(tip.absolutePath)"><a class="dropdown-item">{{ tip.absolutePath }}</a></li>
+            }
+        </ul> -->
+
         <button class="btn btn-outline-secondary" type="button" (click)="onClickParent()" title="Parent Folder">
             <i class="bi bi-arrow-90deg-left"></i>
         </button>
@@ -15,12 +22,12 @@
         </button>
     </div>
 </div>
+
 <div class="mb-2">
-    <h6>File Options:</h6>
     <div class="btn-group" role="group">
         <button class="btn btn-success" (click)="onClickGetDesktopFiles(false)" [disabled]="!service.all"
-            title="Show folders and files in the current folder">
-            Current Folder
+            title="Show folders and files within the current folder">
+            Within Folder
         </button>
         <button class="btn btn-success" (click)="onClickGetDesktopFiles(true)" [disabled]="service.all"
             title="Show all files under the current folder">
@@ -28,6 +35,11 @@
         </button>
     </div>
 </div>
+
+<!-- <div class="mb-2">
+    <h6>Filter</h6>
+    <input type="text" class="form-control" [(ngModel)]="service.filterInput" (change)="onChangeFilterInput()">
+</div> -->
 
 @if (service.loading) {
 <p>Loading...</p>
@@ -54,7 +66,7 @@
     </thead>
     <tbody>
         @for (desktopFile of service.desktopFiles; track $index) {
-        @if (settingsManagementService.showHidden) {
+        @if (settingsService.showHidden) {
         <tr (click)="onClickTableRow(desktopFile)" [ngClass]="{ 'table-light': desktopFile.type === 'folder' }"
             title="{{ desktopFile.absolutePath }}">
             <td>{{ desktopFile.name }}</td>

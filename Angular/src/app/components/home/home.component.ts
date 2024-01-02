@@ -1,8 +1,8 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { DesktopFile } from '../../models/desktop-file';
-import { HomeManagmenetService } from '../../services/home-managmenet.service';
-import { SettingsManagementService } from '../../services/settings-management.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { SettingsService } from '../../services/settings.service';
+import { HomeService } from '../../services/home.service';
 
 @Component({
   selector: 'app-home',
@@ -11,15 +11,15 @@ import { ActivatedRoute, Router } from '@angular/router';
 })
 export class HomeComponent implements OnInit {
 
-  public service: HomeManagmenetService = inject(HomeManagmenetService);
-  public settingsManagementService: SettingsManagementService = inject(SettingsManagementService);
+  public service: HomeService = inject(HomeService);
+  public settingsService: SettingsService = inject(SettingsService);
   private activatedRoute: ActivatedRoute = inject(ActivatedRoute);
   private router: Router = inject(Router);
 
   ngOnInit() {
     if (!this.service.currentFolderPath) {
-      this.settingsManagementService.loadLocalStorage();
-      this.service.currentFolderPath = this.settingsManagementService.defaultFolderPath;
+      this.settingsService.loadSettings();
+      this.service.currentFolderPath = this.settingsService.defaultFolderPath;
     }
 
     this.activatedRoute.queryParams.subscribe(
@@ -78,7 +78,7 @@ export class HomeComponent implements OnInit {
 
   onClickDefault() {
     this.service.all = false;
-    this.service.currentFolderPath = this.settingsManagementService.defaultFolderPath;
+    this.service.currentFolderPath = this.settingsService.defaultFolderPath;
     this.navigateSamePage();
   }
 
@@ -89,4 +89,34 @@ export class HomeComponent implements OnInit {
       }
     });
   }
+
+  // onChangeFilterInput() {
+  //   this.service.filteredDedsktopFiles = [];
+  //   let regExp = new RegExp(this.service.filterInput, 'i');
+
+  //   this.service.desktopFiles.forEach((value: DesktopFile) => {
+  //     if (value.name.match(regExp)) {
+  //       this.service.filteredDedsktopFiles.push(value);
+  //     }
+  //   });
+
+  //   console.log(this.service.filteredDedsktopFiles);
+  // }
+
+  // onCurrentFolderPathFocus() {
+  //   console.log('A');
+  //   this.service.desktopFileTips = [];
+  //   this.service.desktopFiles.forEach((value) => {
+  //     if (value.type === 'folder') {
+  //       this.service.desktopFileTips.push(value);
+  //     }
+  //   })
+  //   console.log(this.service.desktopFileTips.length);
+  // }
+
+  // onClickTip(absolutePath: string) {
+  //   this.service.currentFolderPath = absolutePath;
+  //   this.service.getDesktopFiles();
+  //   this.service.desktopFileTips = [];
+  // }
 }
