@@ -5,15 +5,15 @@
             <div class="modal-header">
                 <h1 class="modal-title fs-5" id="twoButtonModalLabel">{{ modalTitle }}</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
-                    (click)="onClickButton(false)"></button>
+                    (click)="onClickModalButton(false)"></button>
             </div>
             <div class="modal-body">
                 <p>{{ modalMessage }}</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-                    (click)="onClickButton(false)">{{ falseButtonTitle }}</button>
-                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" (click)="onClickButton(true)">{{
+                    (click)="onClickModalButton(false)">{{ falseButtonTitle }}</button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" (click)="onClickModalButton(true)">{{
                     trueButtonTitle }}</button>
             </div>
         </div>

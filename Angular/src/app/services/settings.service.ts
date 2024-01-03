@@ -44,9 +44,4 @@ export class SettingsService {
     this._showHidden = showHidden;
     window.localStorage.setItem(this.SHOW_HIDDEN_KEY, showHidden ? 'true' : 'false');
   }
-
-  // Reset and save settings into the local storage
-  resetSettings() {
-    this.saveSettings();
-  }
 }

@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable, inject } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { DesktopFilePackage } from '../models/desktop-file-package';
 
 @Injectable({
@@ -9,7 +9,7 @@ export class HttpService {
 
   private readonly serverUrl: string = 'http://localhost:8080/';
 
-  private httpClient: HttpClient = inject(HttpClient);
+  constructor(private httpClient: HttpClient) { }
 
   httpGetDesktopFiles(all: boolean, currentFolderPath: string) {
     return this.httpClient.get<DesktopFilePackage>(

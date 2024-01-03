@@ -1,5 +1,6 @@
-import { ChangeDetectorRef, Component, ElementRef, EventEmitter, ViewChild, ViewContainerRef, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, EventEmitter, ViewChild, ViewContainerRef } from '@angular/core';
 import { Modal } from 'bootstrap';
+import { take } from 'rxjs';
 
 @Component({
   selector: 'app-two-button-modal',
@@ -12,18 +13,18 @@ export class TwoButtonModalComponent {
   @ViewChild('twoButtonModal') modalElementRef: ElementRef;
   modalTitle: string;
   modalMessage: string;
-  falseButtonTitle: string;
   trueButtonTitle: string;
+  falseButtonTitle: string;
 
   // Internal Data
   private modal: Modal;
   private modalEventEmitter: EventEmitter<boolean>;
 
   // Injection
-  private changeDetectorRef: ChangeDetectorRef = inject(ChangeDetectorRef);
+  constructor(private changeDetectorRef: ChangeDetectorRef) { }
 
-  // Set up the modal
-  setupModal(modalTitle: string, modalMessage: string, trueButtonTitle: string, falseButtonTitle: string): EventEmitter<boolean> {
+  // Set the modal
+  private setModal(modalTitle: string, modalMessage: string, trueButtonTitle: string, falseButtonTitle: string): EventEmitter<boolean> {
     this.modalTitle = modalTitle;
     this.modalMessage = modalMessage;
     this.trueButtonTitle = trueButtonTitle;
@@ -38,31 +39,30 @@ export class TwoButtonModalComponent {
   }
 
   // Show the modal
-  showModal() {
+  private showModal() {
     this.modal.show();
   }
 
-  // Click the button
-  onClickButton(result: boolean) {
+  // On click the modal button
+  onClickModalButton(result: boolean) {
     this.modalEventEmitter.emit(result);
   }
 
-  // Handel the dyanmic modal
-  static handleDyanmicModal(
+  // Execute the dyanmic modal
+  static executeDyanmicModal(
     modalViewContainerRef: ViewContainerRef,
     modalTitle: string, modalMessage: string, trueButtonTitle: string, falseButtonTitle: string,
-    trueAction: ()=>void = ()=>{}, falseAction: ()=>void = ()=>{}) {
-      const modalComponentRef = modalViewContainerRef.createComponent(TwoButtonModalComponent);
+    trueCallback?: () => void, falseCallback?: () => void) {
+    const modalComponent: TwoButtonModalComponent = modalViewContainerRef.createComponent(TwoButtonModalComponent).instance;
 
-      const modalEventEmitter = modalComponentRef.instance.setupModal(modalTitle, modalMessage, falseButtonTitle, trueButtonTitle);
-      modalEventEmitter
-        .subscribe((value: boolean) => {
-          value ? trueAction() : falseAction();
+    modalComponent.setModal(modalTitle, modalMessage, trueButtonTitle, falseButtonTitle)
+      .pipe(take(1))
+      .subscribe((value: boolean) => {
+        value ? trueCallback?.() : falseCallback?.();
 
-          modalEventEmitter.unsubscribe();
-          modalViewContainerRef.clear();
-        })
+        modalViewContainerRef.clear();
+      });
 
-    modalComponentRef.instance.showModal();
+    modalComponent.showModal();
   }
 }

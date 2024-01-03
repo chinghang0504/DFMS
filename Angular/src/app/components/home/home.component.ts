@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { DesktopFile } from '../../models/desktop-file';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SettingsService } from '../../services/settings.service';
@@ -11,10 +11,7 @@ import { HomeService } from '../../services/home.service';
 })
 export class HomeComponent implements OnInit {
 
-  public service: HomeService = inject(HomeService);
-  public settingsService: SettingsService = inject(SettingsService);
-  private activatedRoute: ActivatedRoute = inject(ActivatedRoute);
-  private router: Router = inject(Router);
+  constructor(public service: HomeService, public settingsService: SettingsService, private activatedRoute: ActivatedRoute, private router: Router) { }
 
   ngOnInit() {
     if (!this.service.currentFolderPath) {

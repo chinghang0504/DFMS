@@ -1,4 +1,4 @@
-import { Component, ViewChild, ViewContainerRef, inject } from '@angular/core';
+import { Component, ViewChild, ViewContainerRef } from '@angular/core';
 import { SettingsService } from '../../services/settings.service';
 import { TwoButtonModalComponent } from '../two-button-modal/two-button-modal.component';
 
@@ -12,10 +12,10 @@ export class SettingsComponent {
   // UI Data
   defaultFolderPath: string;
   showHidden: boolean;
-  @ViewChild('modalContainer', { read: ViewContainerRef }) modalContainer: ViewContainerRef;
+  @ViewChild('modalContainer', { read: ViewContainerRef }) modalViewContainerRef: ViewContainerRef;
 
   // Injection
-  private settingsService: SettingsService = inject(SettingsService);
+  constructor(private settingsService: SettingsService) { }
 
   // On Init
   ngOnInit() {
@@ -31,23 +31,23 @@ export class SettingsComponent {
 
   // On click the save button
   onClickSave() {
-    TwoButtonModalComponent.handleDyanmicModal(
-      this.modalContainer,
-      "Save Confirmation", "Do you want to save changes?", "Cancel", "Save Confirm",
+    TwoButtonModalComponent.executeDyanmicModal(
+      this.modalViewContainerRef,
+      "Save Confirmation", "Do you want to save changes?", "Save changes", "Cancel",
       () => {
         this.settingsService.saveSettings(this.defaultFolderPath, this.showHidden);
-        this.updateUIData(); 
+        this.updateUIData();
       }
     );
   }
 
   // On click the reset button
   onClickReset() {
-    TwoButtonModalComponent.handleDyanmicModal(
-      this.modalContainer,
-      "Reset Confirmation", "Do you want to reset to default?", "Cancel", "Reset Confrim",
+    TwoButtonModalComponent.executeDyanmicModal(
+      this.modalViewContainerRef,
+      "Reset Confirmation", "Do you want to reset to default?", "Reset to default", "Cancel",
       () => {
-        this.settingsService.resetSettings();
+        this.settingsService.saveSettings();
         this.updateUIData();
       }
     );
