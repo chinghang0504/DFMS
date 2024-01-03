@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, ElementRef, EventEmitter, ViewChild, ViewContainerRef } from '@angular/core';
-import { Modal } from 'bootstrap';
 import { take } from 'rxjs';
+import * as bootstrap from "bootstrap";
 
 @Component({
   selector: 'app-two-button-modal',
@@ -17,7 +17,6 @@ export class TwoButtonModalComponent {
   falseButtonTitle: string;
 
   // Internal Data
-  private modal: Modal;
   private modalEventEmitter: EventEmitter<boolean>;
 
   // Injection
@@ -32,7 +31,6 @@ export class TwoButtonModalComponent {
 
     this.changeDetectorRef.detectChanges();
 
-    this.modal = new Modal(this.modalElementRef.nativeElement);
     this.modalEventEmitter = new EventEmitter<boolean>();
 
     return this.modalEventEmitter;
@@ -40,7 +38,7 @@ export class TwoButtonModalComponent {
 
   // Show the modal
   private showModal() {
-    this.modal.show();
+    $(this.modalElementRef.nativeElement).modal('show');
   }
 
   // On click the modal button
