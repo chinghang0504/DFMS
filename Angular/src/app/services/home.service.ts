@@ -14,6 +14,8 @@ export class HomeService {
   private _allFiles: boolean = false;
   private _desktopFiles: DesktopFile[] = [];
   private _sortingMode: SortingMode = SortingMode.NAME_ASCENDING;
+  private _enableSearching: boolean = true;
+  private _searchingInput: string = "";
 
   // Package Data
   private _folderList: DesktopFile[];
@@ -44,6 +46,18 @@ export class HomeService {
   set sortingMode(value) {
     this._sortingMode = value;
   }
+  get enableSearching() {
+    return this._enableSearching;
+  }
+  set enableSearching(value) {
+    this._enableSearching = value;
+  }
+  get searchingInput() {
+    return this._searchingInput;
+  }
+  set searchingInput(value) {
+    this._searchingInput = value;
+  }
 
   // Update the desktop files
   updateDesktopFiles(desktopFilePackage?: DesktopFilePackage) {
@@ -65,8 +79,12 @@ export class HomeService {
   private filterDesktopFiles(desktopFiles: DesktopFile[]): DesktopFile[] {
     return desktopFiles.filter(
       (desktopFile: DesktopFile) => {
-        if (!this.settingsService.showHidden) {
-          return !desktopFile.isHidden;
+        if (!this.settingsService.showHidden && desktopFile.isHidden) {
+          return false;
+        }
+
+        if (this._enableSearching && this._searchingInput) {
+          return desktopFile.name.match(new RegExp(this.searchingInput, 'i'));
         }
 
         return true;

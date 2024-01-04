@@ -179,4 +179,15 @@ export class HomeComponent implements OnInit {
     this.homeService.sortingMode = this.homeService.sortingMode === tableHeader ? tableHeader + 1 : tableHeader;
     this.homeService.updateDesktopFiles();
   }
+
+  // On click the searching button
+  onClickSearchingButton() {
+    this.homeService.enableSearching = !this.homeService.enableSearching;
+    this.homeService.updateDesktopFiles();
+  }
+
+  // On change the searching input
+  onChangeSearchingInput() {
+    this.homeService.updateDesktopFiles();
+  }
 }

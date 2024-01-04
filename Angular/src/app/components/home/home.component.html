@@ -30,6 +30,16 @@
     </div>
 </div>
 
+<div class="mb-2">
+    <button class="btn btn-outline-primary" (click)="onClickSearchingButton()">
+        {{ homeService.enableSearching ? 'Disable Searching' : 'Enable Searching' }}
+    </button>
+    @if (homeService.enableSearching) {
+        <h6>Search</h6>
+        <input type="text" class="form-control" [(ngModel)]="homeService.searchingInput" (input)="onChangeSearchingInput()">
+    }
+</div>
+
 @if (loading) {
 <p>Loading...</p>
 } @else if (errorMessage) {
