@@ -45,7 +45,7 @@ class DesktopFileRestController {
         return ResponseEntity
             .ok()
             .header("Access-Control-Allow-Origin", "*")
-            .body(DesktopFilePackage(desktopFiles.hashCode(), sortedDesktopFiles))
+            .body(DesktopFilePackage(sortedDesktopFiles))
     }
 
     // Open the desktop file

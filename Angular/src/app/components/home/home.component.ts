@@ -61,12 +61,8 @@ export class HomeComponent implements OnInit {
           console.log('Receiving a desktop file package...');
           console.log(res);
 
-          const desktopFilesHashCode: number = res.desktopFilesHashCode;
-          if (this.homeService.desktopFilesHashCode != desktopFilesHashCode) {
-            this.homeService.desktopFilesHashCode = desktopFilesHashCode;
-            this.homeService.desktopFiles = res.desktopFiles;
-            this.updateDesktopFiles();
-          }
+          this.homeService.desktopFiles = res.desktopFiles;
+          this.updateDesktopFiles();
 
           this.homeService.loading = false;
         }, (err) => {
@@ -142,7 +138,7 @@ export class HomeComponent implements OnInit {
   }
 
   // Update the desktop files
-  updateDesktopFiles() {
+  updateDesktopFiles() {  
     this.homeService.filteredDesktopFiles = this.homeService.desktopFiles.filter(
       (desktopFile: DesktopFile) => {
         if (!this.settingsService.showHidden)
