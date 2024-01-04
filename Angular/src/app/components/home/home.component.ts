@@ -173,4 +173,10 @@ export class HomeComponent implements OnInit {
         }
       );
   }
+
+  // On click the table header
+  onClickTableHeader(tableHeader: number) {
+    this.homeService.sortingMode = this.homeService.sortingMode === tableHeader ? tableHeader + 1 : tableHeader;
+    this.homeService.updateDesktopFiles();
+  }
 }

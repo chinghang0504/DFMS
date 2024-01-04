@@ -95,7 +95,7 @@ class DFMSRestController {
             if (it.isDirectory)
                 folderList.add(
                     DesktopFile(
-                        it.name, it.lastModified(), it.extension, it.length(),
+                        it.name, it.lastModified(), it.extension, 0,
                         it.absolutePath, it.parent,
                         it.isDirectory, it.isHidden
                     )

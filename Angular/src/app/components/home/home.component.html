@@ -41,21 +41,46 @@
 <table class="table table-hover">
     <thead>
         <tr>
-            <th style="width: 59%;">Name ({{ homeService.desktopFiles.length }})</th>
-            <th class="text-center" style="width: 15%;">Last modified</th>
-            <th class="text-center" style="width: 6%;">Type</th>
-            <th class="text-center" style="width: 10%;">Size</th>
-            <th class="text-center" style="width: 10%;">Actions</th>
+            <th style="width: 57%;" (click)="onClickTableHeader(0)">
+                Name ({{ homeService.desktopFiles.length }})
+                <i class="bi bi-caret-down-fill" [hidden]="homeService.sortingMode !== 0"></i>
+                <i class="bi bi-caret-up-fill" [hidden]="homeService.sortingMode !== 1"></i>
+            </th>
+            <th class="text-center" style="width: 15%;" (click)="onClickTableHeader(2)">
+                Last modified
+                <i class="bi bi-caret-down-fill" [hidden]="homeService.sortingMode !== 2"></i>
+                <i class="bi bi-caret-up-fill" [hidden]="homeService.sortingMode !== 3"></i>
+            </th>
+            <th class="text-center" style="width: 8%;" (click)="onClickTableHeader(4)">
+                Type
+                <i class="bi bi-caret-down-fill" [hidden]="homeService.sortingMode !== 4"></i>
+                <i class="bi bi-caret-up-fill" [hidden]="homeService.sortingMode !== 5"></i>
+            </th>
+            <th class="text-center" style="width: 10%;" (click)="onClickTableHeader(6)">
+                Size
+                <i class="bi bi-caret-down-fill" [hidden]="homeService.sortingMode !== 6"></i>
+                <i class="bi bi-caret-up-fill" [hidden]="homeService.sortingMode !== 7"></i>
+            </th>
+            <th class="text-center" style="width: 10%;">
+                Actions
+            </th>
         </tr>
     </thead>
     <tbody>
         @for (desktopFile of homeService.desktopFiles; track $index) {
         <tr [ngClass]="{ 'table-light': desktopFile.isFolder}">
-            <td title="{{ desktopFile.absolutePath }}" (click)="onClickTableElementName(desktopFile)">{{
-                desktopFile.name }}</td>
-            <td class="text-center">{{ desktopFile.lastModified | date:'dd/MM/yyyy hh:mm' }}</td>
-            <td class="text-center">{{ desktopFile.extension }}</td>
-            <td class="text-end">{{ desktopFile | byteSize }}</td>
+            <td title="{{ desktopFile.absolutePath }}" (click)="onClickTableElementName(desktopFile)">
+                {{ desktopFile.name }}
+            </td>
+            <td class="text-center">
+                {{ desktopFile.lastModified | date:'yyyy/MM/dd/ hh:mm' }}
+            </td>
+            <td class="text-center">
+                {{ desktopFile.extension }}
+            </td>
+            <td class="text-end">
+                {{ desktopFile | byteSize }}
+            </td>
             <td class="text-center">
                 <i class="bi bi-file-earmark mx-2" title="Open file" [hidden]="desktopFile.isFolder"
                     (click)="onClickOpenFile(desktopFile.absolutePath)"></i>
