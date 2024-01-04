@@ -1,20 +1,18 @@
 import { ChangeDetectorRef, Component, ElementRef, EventEmitter, ViewChild, ViewContainerRef } from '@angular/core';
 import { take } from 'rxjs';
-import * as bootstrap from "bootstrap";
 
 @Component({
-  selector: 'app-two-button-modal',
-  templateUrl: './two-button-modal.component.html',
-  styleUrl: './two-button-modal.component.css'
+  selector: 'app-one-button-modal',
+  templateUrl: './one-button-modal.component.html',
+  styleUrl: './one-button-modal.component.css'
 })
-export class TwoButtonModalComponent {
+export class OneButtonModalComponent {
 
   // UI Data
-  @ViewChild('twoButtonModal') modalElementRef: ElementRef;
+  @ViewChild('oneButtonModal') modalElementRef: ElementRef;
   modalTitle: string;
   modalMessage: string;
   trueButtonTitle: string;
-  falseButtonTitle: string;
 
   // Internal Data
   private modalEventEmitter: EventEmitter<boolean>;
@@ -23,11 +21,10 @@ export class TwoButtonModalComponent {
   constructor(private changeDetectorRef: ChangeDetectorRef) { }
 
   // Set the modal
-  private setModal(modalTitle: string, modalMessage: string, trueButtonTitle: string, falseButtonTitle: string): EventEmitter<boolean> {
+  private setModal(modalTitle: string, modalMessage: string, trueButtonTitle: string): EventEmitter<boolean> {
     this.modalTitle = modalTitle;
     this.modalMessage = modalMessage;
     this.trueButtonTitle = trueButtonTitle;
-    this.falseButtonTitle = falseButtonTitle;
 
     this.changeDetectorRef.detectChanges();
 
@@ -47,11 +44,11 @@ export class TwoButtonModalComponent {
   // Execute the dyanmic modal
   static executeDyanmicModal(
     modalViewContainerRef: ViewContainerRef,
-    modalTitle: string, modalMessage: string, trueButtonTitle: string, falseButtonTitle: string,
+    modalTitle: string, modalMessage: string, trueButtonTitle: string,
     trueCallback?: () => void, falseCallback?: () => void) {
-    const modalComponent: TwoButtonModalComponent = modalViewContainerRef.createComponent(TwoButtonModalComponent).instance;
+    const modalComponent: OneButtonModalComponent = modalViewContainerRef.createComponent(OneButtonModalComponent).instance;
 
-    modalComponent.setModal(modalTitle, modalMessage, trueButtonTitle, falseButtonTitle)
+    modalComponent.setModal(modalTitle, modalMessage, trueButtonTitle)
       .pipe(take(1))
       .subscribe((value: boolean) => {
         value ? trueCallback?.() : falseCallback?.();

@@ -1,8 +1,7 @@
 package com.example.spring.controllers
 
-import com.example.spring.models.DesktopFile
-import com.example.spring.models.DesktopFilePackage
-import com.example.spring.models.Status
+import com.example.spring.models.*
+import com.example.spring.models.comparators.DesktopFileComparator
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -12,63 +11,82 @@ import java.awt.Desktop
 import java.io.File
 import java.net.URLDecoder
 
+const val GET_DESKTOP_FILE_PACKAGE_URL: String = "/getDesktopFilePackage";
+const val OPEN_DESKTOP_FILE_URL: String = "/openDesktopFile";
+
 @RestController
 class DesktopFileRestController {
 
-    @GetMapping("/httpGetDesktopFiles")
-    fun httpGetDesktopFiles(@RequestParam path: String, @RequestParam all: Boolean): ResponseEntity<DesktopFilePackage> {
+    // Get the desktop file package
+    @GetMapping(GET_DESKTOP_FILE_PACKAGE_URL)
+    fun getDesktopFilePackage(@RequestParam path: String, @RequestParam all: Boolean): ResponseEntity<*> {
         val initialFolder: File = File(URLDecoder.decode(path))
+
+        // Error Checking
+        // Folder does not exists
         if (!initialFolder.exists()) {
-            return ResponseEntity
-                .status(Status.FOLDER_DOES_NOT_EXIST.status)
-                .header("Access-Control-Allow-Origin", "*")
-                .body(DesktopFilePackage(Status.FOLDER_DOES_NOT_EXIST.message, null, null))
-        } else if (!initialFolder.isDirectory) {
-            return ResponseEntity
-                .status(Status.NOT_A_FOLDER.status)
-                .header("Access-Control-Allow-Origin", "*")
-                .body(DesktopFilePackage(Status.NOT_A_FOLDER.message, null, null))
+            return getErrorPackageResponseEntity(ErrorStatus.FOLDER_DOES_NOT_EXIST)
+        }
+        // Not a folder
+        else if (!initialFolder.isDirectory) {
+            return getErrorPackageResponseEntity(ErrorStatus.NOT_A_FOLDER)
         }
 
-        val desktopFiles: ArrayList<DesktopFile> = ArrayList()
-        if (all) {
-            getAllDesktopFiles(initialFolder, desktopFiles)
-        } else {
-            getCurrentDesktopFiles(initialFolder, desktopFiles)
-        }
+        // Get the desktop files
+        val desktopFiles: ArrayList<DesktopFile> = ArrayList<DesktopFile>()
+        if (all)
+            addAllDesktopFiles(initialFolder, desktopFiles)
+        else
+            addCurrentDesktopFiles(initialFolder, desktopFiles)
+
+        // Sort the desktop files
+        val sortedDesktopFiles: List<DesktopFile> = desktopFiles.sortedWith(DesktopFileComparator)
 
         return ResponseEntity
-            .status(HttpStatus.ACCEPTED)
+            .ok()
             .header("Access-Control-Allow-Origin", "*")
-            .body(DesktopFilePackage(Status.NORMAL.message, desktopFiles.hashCode(), desktopFiles))
+            .body(DesktopFilePackage(desktopFiles.hashCode(), sortedDesktopFiles))
     }
 
-    private fun getCurrentDesktopFiles(parentFolder: File, desktopFiles: ArrayList<DesktopFile>) {
-        parentFolder.listFiles()?.forEach {
-            if (it.isDirectory) {
-                desktopFiles.add(DesktopFile(it.name, "folder", null, it.absolutePath, it.isHidden))
-            } else {
-                desktopFiles.add(DesktopFile(it.name, it.extension, it.length(), it.absolutePath, it.isHidden))
-            }
+    // Open the desktop file
+    @GetMapping(OPEN_DESKTOP_FILE_URL)
+    fun openDesktopFile(@RequestParam path: String): ResponseEntity<*> {
+        return try {
+            Desktop.getDesktop().open(File(path))
+            ResponseEntity
+                .status(HttpStatus.ACCEPTED)
+                .header("Access-Control-Allow-Origin", "*")
+                .build<Any>()
+        } catch (e: Exception) {
+            getErrorPackageResponseEntity(ErrorStatus.UNABLE_TO_OPEN_DESKTOP_FILE)
         }
     }
 
-    private fun getAllDesktopFiles(parentFolder: File, desktopFiles: ArrayList<DesktopFile>) {
-        parentFolder.listFiles()?.forEach {
-            if (it.isDirectory) {
-                getAllDesktopFiles(it, desktopFiles)
-            } else {
-                desktopFiles.add(DesktopFile(it.name, it.extension, it.length(), it.absolutePath, it.isHidden))
-            }
-        }
-    }
-
-    @GetMapping("/httpOpenDesktopFile")
-    fun httpOpenDesktopFile(@RequestParam path: String): ResponseEntity<String> {
-        Desktop.getDesktop().open(File(path))
+    // Get a response entity of error package
+    private fun getErrorPackageResponseEntity(errorStatus: ErrorStatus): ResponseEntity<ErrorPackage> {
         return ResponseEntity
-            .status(HttpStatus.ACCEPTED)
+            .status(errorStatus.status)
             .header("Access-Control-Allow-Origin", "*")
-            .body("Open")
+            .body(ErrorPackage(errorStatus.message))
+    }
+
+    // Add all desktop files
+    private fun addAllDesktopFiles(parentFolder: File, desktopFiles: ArrayList<DesktopFile>) {
+        parentFolder.listFiles()?.forEach {
+            if (it.isDirectory)
+                addAllDesktopFiles(it, desktopFiles)
+            else
+                desktopFiles.add(DesktopFile(it.name, it.extension, it.length(), it.absolutePath, it.isHidden))
+        }
+    }
+
+    // Add desktop file and directory within the current folder
+    private fun addCurrentDesktopFiles(currentFolder: File, desktopFiles: ArrayList<DesktopFile>) {
+        currentFolder.listFiles()?.forEach {
+            if (it.isDirectory)
+                desktopFiles.add(DesktopFile(it.name, FOLDER_DESKTOP_FILE_TYPE, null, it.absolutePath, it.isHidden))
+            else
+                desktopFiles.add(DesktopFile(it.name, it.extension, it.length(), it.absolutePath, it.isHidden))
+        }
     }
 }

@@ -1,8 +1,12 @@
-import { Component, OnInit } from '@angular/core';
-import { DesktopFile } from '../../models/desktop-file';
+import { Component, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SettingsService } from '../../services/settings.service';
 import { HomeService } from '../../services/home.service';
+import { DesktopFile } from '../../models/desktop-file';
+import { DesktopCommunicationService } from '../../services/desktop-communication.service';
+import { DesktopFilePackage } from '../../models/desktop-file-package';
+import { ErrorPackage } from '../../models/error-package';
+import { OneButtonModalComponent } from '../one-button-modal/one-button-modal.component';
 
 @Component({
   selector: 'app-home',
@@ -11,109 +15,140 @@ import { HomeService } from '../../services/home.service';
 })
 export class HomeComponent implements OnInit {
 
-  constructor(public service: HomeService, public settingsService: SettingsService, private activatedRoute: ActivatedRoute, private router: Router) { }
+  // UI Data
+  @ViewChild('modalContainer', { read: ViewContainerRef }) modalViewContainerRef: ViewContainerRef;
 
+  // Injection
+  constructor(
+    public homeService: HomeService,
+    private settingsService: SettingsService, private desktopCommunicationService: DesktopCommunicationService,
+    private activatedRoute: ActivatedRoute, private router: Router) { }
+
+  // On init
   ngOnInit() {
-    if (!this.service.currentFolderPath) {
-      this.settingsService.loadSettings();
-      this.service.currentFolderPath = this.settingsService.defaultFolderPath;
-    }
+    this.settingsService.loadSettings();
 
     this.activatedRoute.queryParams.subscribe(
       (queryParams) => {
-        let queryParamsPath: string = queryParams['path'];
-        if (queryParamsPath == null) {
-          this.navigateSamePage();
+        const queryParamsPath: string = queryParams['path'];
+
+        if (queryParamsPath) {
+          this.homeService.currentFolderPath = queryParamsPath;
+          this.getDesktopFilePackage();
         } else {
-          this.service.currentFolderPath = queryParamsPath;
-          this.service.getDesktopFiles();
+          this.homeService.currentFolderPath ? this.navigate(true) : this.navigate(false);
         }
       });
   }
 
-  onClickGetDesktopFiles(all: boolean) {
-    this.service.all = all;
-    this.service.getDesktopFiles();
-  }
-
-  onClickSorting(option: number) {
-    if (this.service.sortingMode != option) {
-      this.service.sortingMode = option;
-      this.service.ascending = true;
-    } else {
-      this.service.ascending = !this.service.ascending;
-    }
-
-    this.service.sortDesktopFiles();
-  }
-
-  onClickTableRow(desktopFile: DesktopFile) {
-    if (desktopFile.type === 'folder') {
-      this.service.currentFolderPath = desktopFile.absolutePath;
-      this.navigateSamePage();
-    } else {
-      this.service.openDesktopFile(desktopFile.absolutePath);
-    }
-  }
-
-  onChangeCurrentFolderPath() {
-    this.navigateSamePage();
-  }
-
-  onClickRefresh() {
-    this.service.getDesktopFiles();
-  }
-
-  onClickParent() {
-    let lastIndex = this.service.currentFolderPath.lastIndexOf('\\');
-    if (lastIndex !== -1) {
-      this.service.all = false;
-      this.service.currentFolderPath = this.service.currentFolderPath.substring(0, lastIndex);
-      this.navigateSamePage();
-    }
-  }
-
-  onClickDefault() {
-    this.service.all = false;
-    this.service.currentFolderPath = this.settingsService.defaultFolderPath;
-    this.navigateSamePage();
-  }
-
-  navigateSamePage() {
+  // Navigate this page
+  navigate(current: boolean) {
     this.router.navigate(['/home'], {
       queryParams: {
-        'path': this.service.currentFolderPath
+        'path': current ? this.homeService.currentFolderPath : this.settingsService.defaultFolderPath
       }
     });
   }
 
-  // onChangeFilterInput() {
-  //   this.service.filteredDedsktopFiles = [];
-  //   let regExp = new RegExp(this.service.filterInput, 'i');
+  // Get a desktop file package
+  getDesktopFilePackage() {
+    this.homeService.loading = true;
+    this.homeService.errorMessage = "";
 
-  //   this.service.desktopFiles.forEach((value: DesktopFile) => {
-  //     if (value.name.match(regExp)) {
-  //       this.service.filteredDedsktopFiles.push(value);
-  //     }
-  //   });
+    this.desktopCommunicationService.getDesktopFilePackage(this.homeService.currentFolderPath, this.homeService.allFiles)
+      .subscribe(
+        (res: DesktopFilePackage) => {
+          console.log('Receiving a desktop file package...');
+          console.log(res);
 
-  //   console.log(this.service.filteredDedsktopFiles);
-  // }
+          const desktopFilesHashCode: number = res.desktopFilesHashCode;
+          if (this.homeService.desktopFilesHashCode != desktopFilesHashCode) {
+            this.homeService.desktopFilesHashCode = desktopFilesHashCode;
+            this.homeService.desktopFiles = res.desktopFiles;
+            this.updateDesktopFiles();
+          }
 
-  // onCurrentFolderPathFocus() {
-  //   console.log('A');
-  //   this.service.desktopFileTips = [];
-  //   this.service.desktopFiles.forEach((value) => {
-  //     if (value.type === 'folder') {
-  //       this.service.desktopFileTips.push(value);
-  //     }
-  //   })
-  //   console.log(this.service.desktopFileTips.length);
-  // }
+          this.homeService.loading = false;
+        }, (err) => {
+          if (err['status'] === 400) {
+            this.homeService.errorMessage = (<ErrorPackage>err['error']).message;
+          } else {
+            this.homeService.errorMessage = "Unable to connect to the desktop.";
+          }
 
-  // onClickTip(absolutePath: string) {
-  //   this.service.currentFolderPath = absolutePath;
-  //   this.service.getDesktopFiles();
-  //   this.service.desktopFileTips = [];
-  // }
+          this.homeService.loading = false;
+        }
+      );
+  }
+
+  // On change the current folder path
+  onChangeCurrentFolderPath() {
+    this.navigate(true);
+  }
+
+  // On click the parent button
+  onClickParentButton() {
+    const lastIndex = this.homeService.currentFolderPath.lastIndexOf('\\');
+    if (lastIndex !== -1) {
+      this.homeService.currentFolderPath = this.homeService.currentFolderPath.substring(0, lastIndex);
+      this.homeService.allFiles = false;
+      this.navigate(true);
+    }
+  }
+
+  // On click the default button
+  onClickDefaultButton() {
+    this.homeService.allFiles = false;
+
+    if (this.homeService.currentFolderPath === this.settingsService.defaultFolderPath) {
+      this.getDesktopFilePackage();
+    } else {
+      this.navigate(false);
+    }
+  }
+
+  // On click the fresh button
+  onClickRefreshButton() {
+    this.getDesktopFilePackage();
+  }
+
+  // On click the file option
+  onClickFileOption(allFiles: boolean) {
+    this.homeService.allFiles = allFiles;
+    this.getDesktopFilePackage();
+  }
+
+  // On click the table row
+  onClickTableRow(desktopFile: DesktopFile) {
+    if (desktopFile.type === 'folder') {
+      this.homeService.currentFolderPath = desktopFile.absolutePath;
+      this.navigate(true);
+    } else {
+      this.openDesktopFile(desktopFile.absolutePath, this.modalViewContainerRef);
+    }
+  }
+
+  // Open a desktop file
+  openDesktopFile(desktopFilePath: string, modalViewContainerRef: ViewContainerRef) {
+    this.desktopCommunicationService.openDesktopFile(desktopFilePath)
+      .subscribe(
+        (res) => { }, (err) => {
+          OneButtonModalComponent.executeDyanmicModal(
+            modalViewContainerRef,
+            "Error Message", (<ErrorPackage>err['error']).message, "OK"
+          );
+        }
+      );
+  }
+
+  // Update the desktop files
+  updateDesktopFiles() {
+    this.homeService.filteredDesktopFiles = this.homeService.desktopFiles.filter(
+      (desktopFile: DesktopFile) => {
+        if (!this.settingsService.showHidden)
+          return !desktopFile.isHidden;
+
+        return true;
+      });
+  }
 }

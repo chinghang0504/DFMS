@@ -17,7 +17,7 @@ export class SettingsComponent {
   // Injection
   constructor(private settingsService: SettingsService) { }
 
-  // On Init
+  // On init
   ngOnInit() {
     this.settingsService.loadSettings();
     this.updateUIData();
