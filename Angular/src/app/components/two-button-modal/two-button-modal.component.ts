@@ -44,8 +44,8 @@ export class TwoButtonModalComponent {
     this.modalEventEmitter.emit(result);
   }
 
-  // Execute the dyanmic modal
-  static executeDyanmicModal(
+  // Execute the modal
+  static executeModal(
     modalViewContainerRef: ViewContainerRef,
     modalTitle: string, modalMessage: string, trueButtonTitle: string, falseButtonTitle: string,
     trueCallback?: () => void, falseCallback?: () => void) {

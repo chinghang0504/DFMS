@@ -15,46 +15,46 @@
             <i class="bi bi-arrow-clockwise"></i>
         </button>
     </div>
-</div>
+</div> 
 
 <div class="mb-2">
     <div class="btn-group" role="group">
-        <button class="btn btn-success" (click)="onClickFileOption(false)" [disabled]="!homeService.allFiles"
+        <button class="btn btn-success" (click)="onClickFileOption()" [disabled]="!homeService.allFiles"
             title="Show folders and files within the current folder">
             This Folder
         </button>
-        <button class="btn btn-success" (click)="onClickFileOption(true)" [disabled]="homeService.allFiles"
+        <button class="btn btn-success" (click)="onClickFileOption()" [disabled]="homeService.allFiles"
             title="Show all files under the current folder">
             All Files
         </button>
     </div>
 </div>
 
-@if (homeService.loading) {
+@if (loading) {
 <p>Loading...</p>
-} @else if (homeService.errorMessage) {
+} @else if (errorMessage) {
 <div class="alert alert-danger d-flex align-items-center fade show">
     <i class="bi-exclamation-octagon-fill"></i>
-    <strong class="mx-2">Error!</strong>{{ homeService.errorMessage }}
+    <strong class="mx-2">Error!</strong>{{ errorMessage }}
 </div>
 } @else {
 <table class="table table-hover">
     <thead>
         <tr>
-            <th style="width: 65%;">Name</th>
+            <th style="width: 65%;">Name ({{ homeService.desktopFiles.length }})</th>
             <th class="text-center" style="width: 15%;">Last modified</th>
             <th class="text-center" style="width: 10%;">Type</th>
             <th class="text-center" style="width: 10%;">Size</th>
         </tr>
     </thead>
     <tbody>
-        @for (desktopFile of homeService.filteredDesktopFiles; track $index) {
-        <tr (click)="onClickTableRow(desktopFile)" [ngClass]="{ 'table-light': desktopFile.type === 'folder' }"
+        @for (desktopFile of homeService.desktopFiles; track $index) {
+        <tr (click)="onClickTableRow(desktopFile)" [ngClass]="{ 'table-light': desktopFile.isFolder}"
             title="{{ desktopFile.absolutePath }}">
             <td>{{ desktopFile.name }}</td>
             <td class="text-center">{{ desktopFile.lastModified | date:'dd/MM/yyyy hh:mm' }}</td>
-            <td class="text-center">{{ desktopFile.type }}</td>
-            <td class="text-end">{{ desktopFile.size | byteSize }}</td>
+            <td class="text-center">{{ desktopFile.extension }}</td>
+            <td class="text-end">{{ desktopFile | byteSize }}</td>
         </tr>
         }
     </tbody>

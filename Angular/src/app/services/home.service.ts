@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { DesktopFile } from '../models/desktop-file';
+import { SettingsService } from './settings.service';
+import { DesktopFilePackage } from '../models/desktop-file-package';
 
 @Injectable({
   providedIn: 'root'
@@ -7,18 +9,16 @@ import { DesktopFile } from '../models/desktop-file';
 export class HomeService {
 
   // Persistent data
-  private _currentFolderPath: string;
+  private _currentFolderPath: string = "";
   private _allFiles: boolean = false;
-  private _loading: boolean;
-  private _errorMessage: string;
-  private _filteredDesktopFiles: DesktopFile[];
+  private _desktopFiles: DesktopFile[] = [];
 
   // Package Data
-  private _desktopFilesHashCode: number;
-  private _desktopFiles: DesktopFile[];
+  private _folderList: DesktopFile[];
+  private _fileList: DesktopFile[];
 
   // Injection
-  constructor() { }
+  constructor(private settingsService: SettingsService) { }
 
   // Getters and Setters
   get currentFolderPath() {
@@ -33,34 +33,23 @@ export class HomeService {
   set allFiles(value) {
     this._allFiles = value;
   }
-  get loading() {
-    return this._loading;
-  }
-  set loading(value) {
-    this._loading = value;
-  }
-  get errorMessage() {
-    return this._errorMessage;
-  }
-  set errorMessage(value) {
-    this._errorMessage = value;
-  }
-  get filteredDesktopFiles() {
-    return this._filteredDesktopFiles;
-  }
-  set filteredDesktopFiles(value) {
-    this._filteredDesktopFiles = value;
-  }
-  get desktopFilesHashCode() {
-    return this._desktopFilesHashCode;
-  }
-  set desktopFilesHashCode(value) {
-    this._desktopFilesHashCode = value;
-  }
   get desktopFiles() {
     return this._desktopFiles;
   }
-  set desktopFiles(value) {
-    this._desktopFiles = value;
+
+  // Update the desktop files
+  updateDesktopFiles(desktopFilePackage: DesktopFilePackage) {
+    this._folderList = desktopFilePackage.folderList;
+    this._fileList = desktopFilePackage.fileList;
+
+    this._desktopFiles = this._folderList
+      .concat(this._fileList)
+      .filter((desktopFile: DesktopFile) => {
+        if (!this.settingsService.showHidden) {
+          return !desktopFile.isHidden;
+        }
+
+        return true;
+      });
   }
 }

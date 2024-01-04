@@ -10,8 +10,8 @@ import { TwoButtonModalComponent } from '../two-button-modal/two-button-modal.co
 export class SettingsComponent {
 
   // UI Data
-  defaultFolderPath: string;
-  showHidden: boolean;
+  defaultFolderPath: string = "";
+  showHidden: boolean = false;
   @ViewChild('modalContainer', { read: ViewContainerRef }) modalViewContainerRef: ViewContainerRef;
 
   // Injection
@@ -31,7 +31,7 @@ export class SettingsComponent {
 
   // On click the save button
   onClickSave() {
-    TwoButtonModalComponent.executeDyanmicModal(
+    TwoButtonModalComponent.executeModal(
       this.modalViewContainerRef,
       "Save Confirmation", "Do you want to save changes?", "Save changes", "Cancel",
       () => {
@@ -43,11 +43,11 @@ export class SettingsComponent {
 
   // On click the reset button
   onClickReset() {
-    TwoButtonModalComponent.executeDyanmicModal(
+    TwoButtonModalComponent.executeModal(
       this.modalViewContainerRef,
       "Reset Confirmation", "Do you want to reset to default?", "Reset to default", "Cancel",
       () => {
-        this.settingsService.saveSettings();
+        this.settingsService.resetSettings();
         this.updateUIData();
       }
     );

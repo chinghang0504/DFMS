@@ -1,12 +1,13 @@
 import { Component, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { SettingsService } from '../../services/settings.service';
 import { HomeService } from '../../services/home.service';
 import { DesktopFile } from '../../models/desktop-file';
-import { DesktopCommunicationService } from '../../services/desktop-communication.service';
 import { DesktopFilePackage } from '../../models/desktop-file-package';
 import { ErrorPackage } from '../../models/error-package';
 import { OneButtonModalComponent } from '../one-button-modal/one-button-modal.component';
+import { SettingsService } from '../../services/settings.service';
+import { DesktopCommunicationService } from '../../services/desktop-communication.service';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -16,6 +17,8 @@ import { OneButtonModalComponent } from '../one-button-modal/one-button-modal.co
 export class HomeComponent implements OnInit {
 
   // UI Data
+  loading: boolean = true;
+  errorMessage: string = "";
   @ViewChild('modalContainer', { read: ViewContainerRef }) modalViewContainerRef: ViewContainerRef;
 
   // Injection
@@ -36,59 +39,88 @@ export class HomeComponent implements OnInit {
           this.homeService.currentFolderPath = queryParamsPath;
           this.getDesktopFilePackage();
         } else {
-          this.homeService.currentFolderPath ? this.navigate(true) : this.navigate(false);
+          this.homeService.currentFolderPath ? this.navigateCurrentFolderPath() : this.navigateDefaultFolderPath();
         }
       });
   }
 
-  // Navigate this page
-  navigate(current: boolean) {
+  // Navigate the path
+  private navigate(path: string) {
     this.router.navigate(['/home'], {
       queryParams: {
-        'path': current ? this.homeService.currentFolderPath : this.settingsService.defaultFolderPath
+        'path': path
       }
     });
   }
 
+  // Navigate the current folder path
+  private navigateCurrentFolderPath() {
+    this.navigate(this.homeService.currentFolderPath);
+  }
+
+  // Navigate the default foler path
+  private navigateDefaultFolderPath() {
+    this.navigate(this.settingsService.defaultFolderPath);
+  }
+
   // Get a desktop file package
-  getDesktopFilePackage() {
-    this.homeService.loading = true;
-    this.homeService.errorMessage = "";
+  private getDesktopFilePackage() {
+    this.loading = true;
+    this.errorMessage = "";
 
     this.desktopCommunicationService.getDesktopFilePackage(this.homeService.currentFolderPath, this.homeService.allFiles)
+      .pipe(finalize(() => {
+        this.loading = false;
+      }))
       .subscribe(
         (res: DesktopFilePackage) => {
-          console.log('Receiving a desktop file package...');
-          console.log(res);
+          // console.log('Receiving a desktop file package...');
+          // console.log(res);
 
-          this.homeService.desktopFiles = res.desktopFiles;
-          this.updateDesktopFiles();
-
-          this.homeService.loading = false;
+          this.homeService.updateDesktopFiles(res);
         }, (err) => {
           if (err['status'] === 400) {
-            this.homeService.errorMessage = (<ErrorPackage>err['error']).message;
+            this.errorMessage = (<ErrorPackage>err['error']).message;
           } else {
-            this.homeService.errorMessage = "Unable to connect to the desktop.";
+            this.errorMessage = "Unable to connect to the desktop.";
           }
-
-          this.homeService.loading = false;
         }
       );
   }
 
   // On change the current folder path
   onChangeCurrentFolderPath() {
-    this.navigate(true);
+    this.navigateCurrentFolderPath();
   }
 
   // On click the parent button
   onClickParentButton() {
-    const lastIndex = this.homeService.currentFolderPath.lastIndexOf('\\');
-    if (lastIndex !== -1) {
-      this.homeService.currentFolderPath = this.homeService.currentFolderPath.substring(0, lastIndex);
+    const regExpMatchArray: RegExpMatchArray = this.homeService.currentFolderPath.match(/[\\\/]/g);
+    let numOfSplits: number = regExpMatchArray ? regExpMatchArray.length : 0;
+
+    if (numOfSplits === 1) {
+      const lastChar = this.homeService.currentFolderPath.slice(-1);
+      if (lastChar !== "\\" && lastChar !== "/") {
+        const splitIndex = Math.max(this.homeService.currentFolderPath.lastIndexOf('\\'), this.homeService.currentFolderPath.lastIndexOf('/'));
+        this.homeService.allFiles = false;
+        this.navigate(this.homeService.currentFolderPath.substring(0, splitIndex + 1));
+      } else {
+        this.homeService.allFiles = false;
+        this.getDesktopFilePackage();
+      }
+    } else if (numOfSplits > 1) {
+      const lastChar = this.homeService.currentFolderPath.slice(-1);
+      if (lastChar === "\\" || lastChar === "/") {
+        this.homeService.currentFolderPath = this.homeService.currentFolderPath.substring(0, this.homeService.currentFolderPath.length - 1);
+        numOfSplits--;
+      }
+
+      let splitIndex = Math.max(this.homeService.currentFolderPath.lastIndexOf('\\'), this.homeService.currentFolderPath.lastIndexOf('/'));
+      if (numOfSplits === 1)
+        splitIndex++;
+
       this.homeService.allFiles = false;
-      this.navigate(true);
+      this.navigate(this.homeService.currentFolderPath.substring(0, splitIndex));
     }
   }
 
@@ -99,7 +131,7 @@ export class HomeComponent implements OnInit {
     if (this.homeService.currentFolderPath === this.settingsService.defaultFolderPath) {
       this.getDesktopFilePackage();
     } else {
-      this.navigate(false);
+      this.navigateDefaultFolderPath();
     }
   }
 
@@ -109,42 +141,31 @@ export class HomeComponent implements OnInit {
   }
 
   // On click the file option
-  onClickFileOption(allFiles: boolean) {
-    this.homeService.allFiles = allFiles;
+  onClickFileOption() {
+    this.homeService.allFiles = !this.homeService.allFiles;
     this.getDesktopFilePackage();
   }
 
   // On click the table row
   onClickTableRow(desktopFile: DesktopFile) {
-    if (desktopFile.type === 'folder') {
-      this.homeService.currentFolderPath = desktopFile.absolutePath;
-      this.navigate(true);
+    if (desktopFile.isFolder) {
+      this.navigate(desktopFile.absolutePath);
     } else {
-      this.openDesktopFile(desktopFile.absolutePath, this.modalViewContainerRef);
+      this.openDesktopFile(desktopFile.absolutePath);
     }
   }
 
   // Open a desktop file
-  openDesktopFile(desktopFilePath: string, modalViewContainerRef: ViewContainerRef) {
+  private openDesktopFile(desktopFilePath: string) {
     this.desktopCommunicationService.openDesktopFile(desktopFilePath)
       .subscribe(
-        (res) => { }, (err) => {
-          OneButtonModalComponent.executeDyanmicModal(
-            modalViewContainerRef,
+        (res) => { },
+        (err) => {
+          OneButtonModalComponent.executeModal(
+            this.modalViewContainerRef,
             "Error Message", (<ErrorPackage>err['error']).message, "OK"
           );
         }
       );
-  }
-
-  // Update the desktop files
-  updateDesktopFiles() {  
-    this.homeService.filteredDesktopFiles = this.homeService.desktopFiles.filter(
-      (desktopFile: DesktopFile) => {
-        if (!this.settingsService.showHidden)
-          return !desktopFile.isHidden;
-
-        return true;
-      });
   }
 }

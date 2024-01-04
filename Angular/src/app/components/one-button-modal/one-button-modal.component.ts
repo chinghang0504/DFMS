@@ -1,5 +1,6 @@
 import { ChangeDetectorRef, Component, ElementRef, EventEmitter, ViewChild, ViewContainerRef } from '@angular/core';
 import { take } from 'rxjs';
+import * as bootstrap from "bootstrap";
 
 @Component({
   selector: 'app-one-button-modal',
@@ -41,8 +42,8 @@ export class OneButtonModalComponent {
     this.modalEventEmitter.emit(result);
   }
 
-  // Execute the dyanmic modal
-  static executeDyanmicModal(
+  // Execute the modal
+  static executeModal(
     modalViewContainerRef: ViewContainerRef,
     modalTitle: string, modalMessage: string, trueButtonTitle: string,
     trueCallback?: () => void, falseCallback?: () => void) {
