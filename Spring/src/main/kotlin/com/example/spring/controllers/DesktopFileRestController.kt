@@ -76,7 +76,7 @@ class DesktopFileRestController {
             if (it.isDirectory)
                 addAllDesktopFiles(it, desktopFiles)
             else
-                desktopFiles.add(DesktopFile(it.name, it.extension, it.length(), it.absolutePath, it.isHidden))
+                desktopFiles.add(DesktopFile(it.name, it.extension, it.length(), it.absolutePath, it.isHidden, it.lastModified()))
         }
     }
 
@@ -84,9 +84,9 @@ class DesktopFileRestController {
     private fun addCurrentDesktopFiles(currentFolder: File, desktopFiles: ArrayList<DesktopFile>) {
         currentFolder.listFiles()?.forEach {
             if (it.isDirectory)
-                desktopFiles.add(DesktopFile(it.name, FOLDER_DESKTOP_FILE_TYPE, null, it.absolutePath, it.isHidden))
+                desktopFiles.add(DesktopFile(it.name, FOLDER_DESKTOP_FILE_TYPE, null, it.absolutePath, it.isHidden, null))
             else
-                desktopFiles.add(DesktopFile(it.name, it.extension, it.length(), it.absolutePath, it.isHidden))
+                desktopFiles.add(DesktopFile(it.name, it.extension, it.length(), it.absolutePath, it.isHidden, it.lastModified()))
         }
     }
 }

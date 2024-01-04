@@ -8,5 +8,6 @@ data class DesktopFile(
     val type: String,
     val size: Long?,
     val absolutePath: String,
-    val isHidden: Boolean
+    val isHidden: Boolean,
+    val lastModified: Long?
 )

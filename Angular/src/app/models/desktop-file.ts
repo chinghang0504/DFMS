@@ -5,4 +5,5 @@ export interface DesktopFile {
     size: number;
     absolutePath: string;
     isHidden: boolean;
+    lastModified: number;
 }

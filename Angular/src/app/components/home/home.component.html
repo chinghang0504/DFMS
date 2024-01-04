@@ -41,7 +41,8 @@
 <table class="table table-hover">
     <thead>
         <tr>
-            <th style="width: 80%;">Name</th>
+            <th style="width: 65%;">Name</th>
+            <th class="text-center" style="width: 15%;">Last modified</th>
             <th class="text-center" style="width: 10%;">Type</th>
             <th class="text-center" style="width: 10%;">Size</th>
         </tr>
@@ -51,6 +52,7 @@
         <tr (click)="onClickTableRow(desktopFile)" [ngClass]="{ 'table-light': desktopFile.type === 'folder' }"
             title="{{ desktopFile.absolutePath }}">
             <td>{{ desktopFile.name }}</td>
+            <td class="text-center">{{ desktopFile.lastModified | date:'dd/MM/yyyy hh:mm' }}</td>
             <td class="text-center">{{ desktopFile.type }}</td>
             <td class="text-end">{{ desktopFile.size | byteSize }}</td>
         </tr>
