@@ -8,6 +8,7 @@ data class DesktopFile(
     val size: Long,
 
     val absolutePath: String,
+    val parentFolderPath: String,
 
     val isFolder: Boolean,
     val isHidden: Boolean

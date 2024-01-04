@@ -6,6 +6,7 @@ export interface DesktopFile {
     size: number;
 
     absolutePath: string;
+    parentFolderPath: string;
 
     isFolder: boolean;
     isHidden: boolean;

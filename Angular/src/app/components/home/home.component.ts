@@ -146,17 +146,22 @@ export class HomeComponent implements OnInit {
     this.getDesktopFilePackage();
   }
 
-  // On click the table row
-  onClickTableRow(desktopFile: DesktopFile) {
+  // On click the table element name
+  onClickTableElementName(desktopFile: DesktopFile) {
     if (desktopFile.isFolder) {
       this.navigate(desktopFile.absolutePath);
     } else {
-      this.openDesktopFile(desktopFile.absolutePath);
+      this.openFile(desktopFile.absolutePath);
     }
   }
 
-  // Open a desktop file
-  private openDesktopFile(desktopFilePath: string) {
+  // On click the open file
+  onClickOpenFile(desktopFilePath: string) {
+    this.openFile(desktopFilePath);
+  }
+
+  // Open the file
+  private openFile(desktopFilePath: string) {
     this.desktopCommunicationService.openDesktopFile(desktopFilePath)
       .subscribe(
         (res) => { },

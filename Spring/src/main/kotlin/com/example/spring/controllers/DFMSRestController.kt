@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import java.awt.Desktop
 import java.io.File
-import java.net.URLDecoder
 
 private const val GET_DESKTOP_FILE_PACKAGE_URL: String = "/getDesktopFilePackage";
 private const val OPEN_DESKTOP_FILE_URL: String = "/openDesktopFile";
@@ -21,7 +20,7 @@ class DFMSRestController {
     // Get the desktop file package
     @GetMapping(GET_DESKTOP_FILE_PACKAGE_URL)
     fun getDesktopFilePackage(@RequestParam path: String, @RequestParam all: Boolean): ResponseEntity<*> {
-        val initialFolder: File = File(URLDecoder.decode(path))
+        val initialFolder: File = File(path)
 
         // Folder does not exists
         if (!initialFolder.exists()) {
@@ -79,7 +78,7 @@ class DFMSRestController {
                 fileList.add(
                     DesktopFile(
                         it.name, it.lastModified(), it.extension, it.length(),
-                        it.absolutePath,
+                        it.absolutePath, it.parent,
                         it.isDirectory, it.isHidden
                     )
                 )
@@ -97,7 +96,7 @@ class DFMSRestController {
                 folderList.add(
                     DesktopFile(
                         it.name, it.lastModified(), it.extension, it.length(),
-                        it.absolutePath,
+                        it.absolutePath, it.parent,
                         it.isDirectory, it.isHidden
                     )
                 )
@@ -105,7 +104,7 @@ class DFMSRestController {
                 fileList.add(
                     DesktopFile(
                         it.name, it.lastModified(), it.extension, it.length(),
-                        it.absolutePath,
+                        it.absolutePath, it.parent,
                         it.isDirectory, it.isHidden
                     )
                 )

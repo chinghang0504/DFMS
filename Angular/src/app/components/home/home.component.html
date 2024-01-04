@@ -15,7 +15,7 @@
             <i class="bi bi-arrow-clockwise"></i>
         </button>
     </div>
-</div> 
+</div>
 
 <div class="mb-2">
     <div class="btn-group" role="group">
@@ -41,20 +41,27 @@
 <table class="table table-hover">
     <thead>
         <tr>
-            <th style="width: 65%;">Name ({{ homeService.desktopFiles.length }})</th>
+            <th style="width: 59%;">Name ({{ homeService.desktopFiles.length }})</th>
             <th class="text-center" style="width: 15%;">Last modified</th>
-            <th class="text-center" style="width: 10%;">Type</th>
+            <th class="text-center" style="width: 6%;">Type</th>
             <th class="text-center" style="width: 10%;">Size</th>
+            <th class="text-center" style="width: 10%;">Actions</th>
         </tr>
     </thead>
     <tbody>
         @for (desktopFile of homeService.desktopFiles; track $index) {
-        <tr (click)="onClickTableRow(desktopFile)" [ngClass]="{ 'table-light': desktopFile.isFolder}"
-            title="{{ desktopFile.absolutePath }}">
-            <td>{{ desktopFile.name }}</td>
+        <tr [ngClass]="{ 'table-light': desktopFile.isFolder}">
+            <td title="{{ desktopFile.absolutePath }}" (click)="onClickTableElementName(desktopFile)">{{
+                desktopFile.name }}</td>
             <td class="text-center">{{ desktopFile.lastModified | date:'dd/MM/yyyy hh:mm' }}</td>
             <td class="text-center">{{ desktopFile.extension }}</td>
             <td class="text-end">{{ desktopFile | byteSize }}</td>
+            <td class="text-center">
+                <i class="bi bi-file-earmark mx-2" title="Open file" [hidden]="desktopFile.isFolder"
+                    (click)="onClickOpenFile(desktopFile.absolutePath)"></i>
+                <i class="bi bi-folder mx-2" title="Open parent folder" [hidden]="desktopFile.isFolder"
+                    (click)="onClickOpenFile(desktopFile.parentFolderPath)"></i>
+            </td>
         </tr>
         }
     </tbody>
