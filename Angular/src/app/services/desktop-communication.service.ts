@@ -10,6 +10,7 @@ export class DesktopCommunicationService {
   private readonly SERVER_URL: string = 'http://localhost:8080/';
   private readonly GET_DESKTOP_FILE_PACKAGE_URL: string = 'getDesktopFilePackage';
   private readonly OPEN_DESKTOP_FILE_URL: string = 'openDesktopFile';
+  private readonly DELETE_DESKTOP_FILE_URL: string = 'deleteDesktopFile';
 
   // Injection
   constructor(private httpClient: HttpClient) { }
@@ -31,6 +32,18 @@ export class DesktopCommunicationService {
   openDesktopFile(desktopFilePath: string) {
     return this.httpClient.get(
       this.SERVER_URL + this.OPEN_DESKTOP_FILE_URL,
+      {
+        params: {
+          'path': desktopFilePath
+        }
+      }
+    );
+  }
+
+  // Delete a desktop file
+  deleteDesktopFile(desktopFilePath: string) {
+    return this.httpClient.get(
+      this.SERVER_URL + this.DELETE_DESKTOP_FILE_URL,
       {
         params: {
           'path': desktopFilePath

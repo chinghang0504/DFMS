@@ -14,7 +14,7 @@ export class HomeService {
   private _allFiles: boolean = false;
   private _desktopFiles: DesktopFile[] = [];
   private _sortingMode: SortingMode = SortingMode.NAME_ASCENDING;
-  private _enableSearching: boolean = true;
+  private _enableSearching: boolean = false;
   private _searchingInput: string = "";
 
   // Package Data

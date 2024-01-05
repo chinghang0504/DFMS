@@ -10,9 +10,12 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import java.awt.Desktop
 import java.io.File
+import java.nio.file.Files
+import kotlin.io.path.Path
 
 private const val GET_DESKTOP_FILE_PACKAGE_URL: String = "/getDesktopFilePackage";
 private const val OPEN_DESKTOP_FILE_URL: String = "/openDesktopFile";
+private const val DELETE_DESKTOP_FILE_URL: String = "/deleteDesktopFile";
 
 @RestController
 class DFMSRestController {
@@ -45,20 +48,6 @@ class DFMSRestController {
             .accepted()
             .header("Access-Control-Allow-Origin", "*")
             .body(DesktopFilePackage(sortedFolderList, sortedFileList))
-    }
-
-    // Open the file
-    @GetMapping(OPEN_DESKTOP_FILE_URL)
-    fun openDesktopFile(@RequestParam path: String): ResponseEntity<*> {
-        return try {
-            Desktop.getDesktop().open(File(path))
-            ResponseEntity
-                .accepted()
-                .header("Access-Control-Allow-Origin", "*")
-                .build<Any>()
-        } catch (e: Exception) {
-            getErrorPackageResponseEntity(ErrorStatus.UNABLE_TO_OPEN_FILE)
-        }
     }
 
     // Get a response entity of error package
@@ -108,6 +97,34 @@ class DFMSRestController {
                         it.isDirectory, it.isHidden
                     )
                 )
+        }
+    }
+
+    // Open the file
+    @GetMapping(OPEN_DESKTOP_FILE_URL)
+    fun openDesktopFile(@RequestParam path: String): ResponseEntity<*> {
+        return try {
+            Desktop.getDesktop().open(File(path))
+            ResponseEntity
+                .accepted()
+                .header("Access-Control-Allow-Origin", "*")
+                .build<Any>()
+        } catch (e: Exception) {
+            getErrorPackageResponseEntity(ErrorStatus.UNABLE_TO_OPEN_FILE)
+        }
+    }
+
+    // Delete the file
+    @GetMapping(DELETE_DESKTOP_FILE_URL)
+    fun deleteDesktopFile(@RequestParam path: String): ResponseEntity<*> {
+        return try {
+            Files.delete(Path(path))
+            ResponseEntity
+                .accepted()
+                .header("Access-Control-Allow-Origin", "*")
+                .build<Any>()
+        } catch (e: Exception) {
+            getErrorPackageResponseEntity(ErrorStatus.UNABLE_TO_DELETE_FILE)
         }
     }
 }

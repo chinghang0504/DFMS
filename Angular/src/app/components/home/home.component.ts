@@ -8,6 +8,7 @@ import { OneButtonModalComponent } from '../one-button-modal/one-button-modal.co
 import { SettingsService } from '../../services/settings.service';
 import { DesktopCommunicationService } from '../../services/desktop-communication.service';
 import { finalize } from 'rxjs';
+import { TwoButtonModalComponent } from '../two-button-modal/two-button-modal.component';
 
 @Component({
   selector: 'app-home',
@@ -168,7 +169,7 @@ export class HomeComponent implements OnInit {
         (err) => {
           OneButtonModalComponent.executeModal(
             this.modalViewContainerRef,
-            "Error Message", (<ErrorPackage>err['error']).message, "OK"
+            "System Error", (<ErrorPackage>err['error']).message, "OK"
           );
         }
       );
@@ -189,5 +190,27 @@ export class HomeComponent implements OnInit {
   // On change the searching input
   onChangeSearchingInput() {
     this.homeService.updateDesktopFiles();
+  }
+
+  // On click delete file
+  onClickDeleteFile(desktopFile: DesktopFile) {
+    TwoButtonModalComponent.executeModal(
+      this.modalViewContainerRef,
+      "Delete Confirmation", `Are you sure want to delete ${desktopFile.name}`, "Delete this file", "Cancel",
+      () => {
+        this.desktopCommunicationService.deleteDesktopFile(desktopFile.absolutePath)
+          .subscribe(
+            (res) => {
+              this.getDesktopFilePackage();
+            },
+            (err) => {
+              OneButtonModalComponent.executeModal(
+                this.modalViewContainerRef,
+                "System Error", (<ErrorPackage>err['error']).message, "OK"
+              );
+            }
+          );
+      }
+    );
   }
 }
