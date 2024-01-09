@@ -35,7 +35,7 @@
         {{ homeService.enableSearching ? 'Disable Searching' : 'Enable Searching' }}
     </button>
     @if (homeService.enableSearching) {
-    <h6>Search</h6>
+    <h6>Search By Name</h6>
     <input type="text" class="form-control" [(ngModel)]="homeService.searchingInput" (input)="onChangeSearchingInput()">
     }
 </div>
@@ -92,12 +92,13 @@
                 {{ desktopFile | byteSize }}
             </td>
             <td class="text-center">
-                <i class="bi bi-file-earmark mx-2" title="Open file" [hidden]="desktopFile.isFolder"
-                    (click)="onClickOpenFile(desktopFile.absolutePath)"></i>
-                <i class="bi bi-folder mx-2" title="Open parent folder" [hidden]="desktopFile.isFolder"
-                    (click)="onClickOpenFile(desktopFile.parentFolderPath)"></i>
-                <i class="bi bi-trash mx-2" title="Delete file" [hidden]="desktopFile.isFolder"
-                    (click)="onClickDeleteFile(desktopFile)"></i>
+                @if (desktopFile.isFolder) {
+                    <i class="bi bi-folder mx-2" title="Open folder" (click)="onClickOpenFile(desktopFile.absolutePath)"></i>
+                } @else {
+                    <i class="bi bi-file-earmark mx-2" title="Open file" (click)="onClickOpenFile(desktopFile.absolutePath)"></i>
+                    <i class="bi bi-folder mx-2" title="Show in folder" (click)="onClickOpenFile(desktopFile.parentFolderPath)"></i>
+                    <i class="bi bi-trash mx-2" title="Delete file" (click)="onClickDeleteFile(desktopFile)"></i>
+                }
             </td>
         </tr>
         }

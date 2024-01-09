@@ -39,11 +39,11 @@ export class SettingsService {
 
   // Save settings into the local storage
   saveSettings(defaultFolderPath: string, showHidden: boolean) {
-    this._defaultFolderPath = defaultFolderPath;
     window.localStorage.setItem(this.DEFAULT_FOLDER_PATH_KEY, defaultFolderPath);
+    this._defaultFolderPath = defaultFolderPath;
 
-    this._showHidden = showHidden;
     window.localStorage.setItem(this.SHOW_HIDDEN_KEY, showHidden ? 'true' : 'false');
+    this._showHidden = showHidden;
   }
 
   // Reset settings
