@@ -10,5 +10,5 @@ enum class ErrorStatus(val status: HttpStatus, val message: String) {
 
     UNABLE_TO_OPEN_FILE(HttpStatus.BAD_REQUEST, "Unable to open this file."),
 
-    UNABLE_TO_DELETE_FILE(HttpStatus.BAD_REQUEST, "Unable to delete this file.")
+    UNABLE_TO_DELETE_FILE(HttpStatus.BAD_REQUEST, "Unable to delete this file.");
 }
