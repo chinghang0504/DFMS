@@ -19,7 +19,6 @@ export class SettingsComponent {
 
   // On init
   ngOnInit() {
-    this.settingsService.loadSettings();
     this.updateUIData();
   }
 

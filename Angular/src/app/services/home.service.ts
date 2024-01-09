@@ -21,6 +21,9 @@ export class HomeService {
   private _folderList: DesktopFile[];
   private _fileList: DesktopFile[];
 
+  // Worker
+  private _worker: Worker;
+
   // Injection
   constructor(private settingsService: SettingsService) { }
 
@@ -39,6 +42,9 @@ export class HomeService {
   }
   get desktopFiles() {
     return this._desktopFiles;
+  }
+  set desktopFiles(value) {
+    this._desktopFiles = value;
   }
   get sortingMode() {
     return this._sortingMode;
@@ -66,25 +72,55 @@ export class HomeService {
       this._fileList = desktopFilePackage.fileList;
     }
 
-    const tempFolderList: DesktopFile[] = this.filterDesktopFiles(this._folderList);
-    const tempFileList: DesktopFile[] = this.filterDesktopFiles(this._fileList);
+    if (typeof Worker !== 'undefined') {
+      console.log('Start');
+      this._worker = new Worker(new URL('../workers/home.worker', import.meta.url));
 
-    this.sortDesktopFiles(tempFolderList);
-    this.sortDesktopFiles(tempFileList);
+      this._worker.onmessage = ({ data }) => {
+        this._desktopFiles = data;
+        console.log('End');
+      };
 
-    this._desktopFiles = tempFolderList.concat(tempFileList);
+      this._worker.postMessage({
+        folderList: this._folderList,
+        fileList: this._fileList,
+        sortingMode: this._sortingMode,
+        enableSearching: this._enableSearching,
+        searchingInput: this._searchingInput,
+        showHidden: this.settingsService.showHidden
+      });
+    } else {
+      const tempFolderList: DesktopFile[] = HomeService.filterDesktopFiles(this._folderList, this.settingsService.showHidden, this._enableSearching, this._searchingInput);
+      const tempFileList: DesktopFile[] = HomeService.filterDesktopFiles(this._fileList, this.settingsService.showHidden, this._enableSearching, this._searchingInput);
+
+      HomeService.sortDesktopFiles(tempFolderList, this._sortingMode);
+      HomeService.sortDesktopFiles(tempFileList, this._sortingMode);
+
+      this._desktopFiles = tempFolderList.concat(tempFileList).slice(0, 1000);
+    }
+  }
+
+  // Update the desktop files though worker
+  static updateDesktopFilesWorker(data: { folderList: DesktopFile[], fileList: DesktopFile[], sortingMode: SortingMode, enableSearching: boolean, searchingInput: string, showHidden: boolean; }) {
+    const tempFolderList: DesktopFile[] = HomeService.filterDesktopFiles(data.folderList, data.showHidden, data.enableSearching, data.searchingInput);
+    const tempFileList: DesktopFile[] = HomeService.filterDesktopFiles(data.fileList, data.showHidden, data.enableSearching, data.searchingInput);
+
+    HomeService.sortDesktopFiles(tempFolderList, data.sortingMode);
+    HomeService.sortDesktopFiles(tempFileList, data.sortingMode);
+
+    return tempFolderList.concat(tempFileList).slice(0, 1000);
   }
 
   // Filter the desktop files
-  private filterDesktopFiles(desktopFiles: DesktopFile[]): DesktopFile[] {
+  static filterDesktopFiles(desktopFiles: DesktopFile[], showHidden: boolean, enableSearching: boolean, searchingInput: string): DesktopFile[] {
     return desktopFiles.filter(
       (desktopFile: DesktopFile) => {
-        if (!this.settingsService.showHidden && desktopFile.isHidden) {
+        if (!showHidden && desktopFile.isHidden) {
           return false;
         }
 
-        if (this._enableSearching && this._searchingInput) {
-          return desktopFile.name.match(new RegExp(this.searchingInput, 'i'));
+        if (enableSearching && searchingInput) {
+          return desktopFile.name.toLocaleLowerCase().indexOf(searchingInput.toLocaleLowerCase()) != -1;
         }
 
         return true;
@@ -93,24 +129,24 @@ export class HomeService {
   }
 
   // Sort the desktop files
-  private sortDesktopFiles(desktopFiles: DesktopFile[]) {
-    if (this._sortingMode === SortingMode.NAME_ASCENDING || this._sortingMode === SortingMode.NAME_DESCENDING) {
-      const factor: number = this._sortingMode % 2 === 0 ? 1 : -1;
+  static sortDesktopFiles(desktopFiles: DesktopFile[], sortingMode: SortingMode) {
+    if (sortingMode === SortingMode.NAME_ASCENDING || sortingMode === SortingMode.NAME_DESCENDING) {
+      const factor: number = sortingMode % 2 === 0 ? 1 : -1;
       desktopFiles.sort((a, b) => {
         return a.name.toLocaleLowerCase().localeCompare(b.name.toLocaleLowerCase()) * factor;
       });
-    } else if (this._sortingMode === SortingMode.LAST_MODIFIED_ASCENDING || this._sortingMode === SortingMode.LAST_MODIFIED_DESCENDING) {
-      const factor: number = this._sortingMode % 2 === 0 ? 1 : -1;
+    } else if (sortingMode === SortingMode.LAST_MODIFIED_ASCENDING || sortingMode === SortingMode.LAST_MODIFIED_DESCENDING) {
+      const factor: number = sortingMode % 2 === 0 ? 1 : -1;
       desktopFiles.sort((a, b) => {
         return (a.lastModified - b.lastModified) * factor;
       });
-    } else if (this._sortingMode === SortingMode.TYPE_ASCENDING || this._sortingMode === SortingMode.TYPE_DESCENDING) {
-      const factor: number = this._sortingMode % 2 === 0 ? 1 : -1;
+    } else if (sortingMode === SortingMode.TYPE_ASCENDING || sortingMode === SortingMode.TYPE_DESCENDING) {
+      const factor: number = sortingMode % 2 === 0 ? 1 : -1;
       desktopFiles.sort((a, b) => {
         return a.extension.toLocaleLowerCase().localeCompare(b.extension.toLocaleLowerCase()) * factor;
       });
-    } else if (this._sortingMode === SortingMode.SIZE_ASCENDING || this._sortingMode === SortingMode.SIZE_DESCENDING) {
-      const factor: number = this._sortingMode % 2 === 0 ? 1 : -1;
+    } else if (sortingMode === SortingMode.SIZE_ASCENDING || sortingMode === SortingMode.SIZE_DESCENDING) {
+      const factor: number = sortingMode % 2 === 0 ? 1 : -1;
       desktopFiles.sort((a, b) => {
         return (a.size - b.size) * factor;
       });

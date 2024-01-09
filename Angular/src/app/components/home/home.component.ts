@@ -7,7 +7,7 @@ import { ErrorPackage } from '../../models/error-package';
 import { OneButtonModalComponent } from '../one-button-modal/one-button-modal.component';
 import { SettingsService } from '../../services/settings.service';
 import { DesktopCommunicationService } from '../../services/desktop-communication.service';
-import { finalize } from 'rxjs';
+import { Subscription, finalize } from 'rxjs';
 import { TwoButtonModalComponent } from '../two-button-modal/two-button-modal.component';
 
 @Component({
@@ -28,10 +28,11 @@ export class HomeComponent implements OnInit {
     private settingsService: SettingsService, private desktopCommunicationService: DesktopCommunicationService,
     private activatedRoute: ActivatedRoute, private router: Router) { }
 
+  // Internal Data
+  private _subscription: Subscription;
+
   // On init
   ngOnInit() {
-    this.settingsService.loadSettings();
-
     this.activatedRoute.queryParams.subscribe(
       (queryParams) => {
         const queryParamsPath: string = queryParams['path'];
@@ -68,15 +69,17 @@ export class HomeComponent implements OnInit {
   private getDesktopFilePackage() {
     this.loading = true;
     this.errorMessage = "";
+    this.homeService.desktopFiles = [];
 
-    this.desktopCommunicationService.getDesktopFilePackage(this.homeService.currentFolderPath, this.homeService.allFiles)
+    this._subscription?.unsubscribe();
+    this._subscription = this.desktopCommunicationService.getDesktopFilePackage(this.homeService.currentFolderPath, this.homeService.allFiles)
       .pipe(finalize(() => {
         this.loading = false;
       }))
       .subscribe(
         (res: DesktopFilePackage) => {
-          // console.log('Receiving a desktop file package...');
-          // console.log(res);
+          console.log('Receiving a desktop file package...');
+          console.log(res);
 
           this.homeService.updateDesktopFiles(res);
         }, (err) => {
