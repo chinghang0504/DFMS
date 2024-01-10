@@ -9,6 +9,7 @@ import java.awt.event.ActionListener
 import java.net.URI
 import javax.swing.JButton
 import javax.swing.JFrame
+import javax.swing.JLabel
 
 @SpringBootApplication
 class Application
@@ -16,14 +17,17 @@ class Application
 fun main(args: Array<String>) {
     SpringApplicationBuilder(Application::class.java).headless(false).run(*args)
 
-    val frame = JFrame("DFMS")
+    val frame: JFrame = JFrame("DFMS")
     frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
     frame.setSize(300, 200)
     frame.isVisible = true
 
-    val startButton = JButton("Open Browser")
-    frame.add(startButton, BorderLayout.CENTER)
-    startButton.addActionListener(object: ActionListener {
+    val label: JLabel = JLabel("DFMS")
+    frame.add(label, BorderLayout.NORTH)
+
+    val openButton: JButton = JButton("Open Browser")
+    frame.add(openButton, BorderLayout.CENTER)
+    openButton.addActionListener(object: ActionListener {
 
         override fun actionPerformed(e: ActionEvent?) {
             Desktop.getDesktop().browse(URI("http://localhost:4200/"))

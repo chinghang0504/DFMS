@@ -69,9 +69,11 @@ export class HomeComponent implements OnInit {
   private getDesktopFilePackage() {
     this.loading = true;
     this.errorMessage = "";
-    this.homeService.desktopFiles = [];
+    this.homeService.clearData();
 
+    // Unsubscribe the previous get request
     this._subscription?.unsubscribe();
+
     this._subscription = this.desktopCommunicationService.getDesktopFilePackage(this.homeService.currentFolderPath, this.homeService.allFiles)
       .pipe(finalize(() => {
         this.loading = false;
@@ -99,32 +101,41 @@ export class HomeComponent implements OnInit {
 
   // On click the parent button
   onClickParentButton() {
+    this.homeService.allFiles = false;
+
     const regExpMatchArray: RegExpMatchArray = this.homeService.currentFolderPath.match(/[\\\/]/g);
     let numOfSplits: number = regExpMatchArray ? regExpMatchArray.length : 0;
 
+    // Only one split
     if (numOfSplits === 1) {
-      const lastChar = this.homeService.currentFolderPath.slice(-1);
-      if (lastChar !== "\\" && lastChar !== "/") {
-        const splitIndex = Math.max(this.homeService.currentFolderPath.lastIndexOf('\\'), this.homeService.currentFolderPath.lastIndexOf('/'));
-        this.homeService.allFiles = false;
-        this.navigate(this.homeService.currentFolderPath.substring(0, splitIndex + 1));
-      } else {
-        this.homeService.allFiles = false;
+      const lastChar: string = this.homeService.currentFolderPath.slice(-1);
+
+      // The last character is a split
+      if (lastChar === "\\" || lastChar === "/") {
         this.getDesktopFilePackage();
       }
-    } else if (numOfSplits > 1) {
-      const lastChar = this.homeService.currentFolderPath.slice(-1);
+      // The last character is not a split
+      else {
+        const splitIndex: number = Math.max(this.homeService.currentFolderPath.lastIndexOf('\\'), this.homeService.currentFolderPath.lastIndexOf('/'));
+        this.navigate(this.homeService.currentFolderPath.substring(0, splitIndex + 1));
+      }
+
+      return;
+    }
+
+    // More than one splits
+    if (numOfSplits > 1) {
+      const lastChar: string = this.homeService.currentFolderPath.slice(-1);
+      let tempCurrentFolderPath: string = this.homeService.currentFolderPath;
+
+      // The last character is a split 
       if (lastChar === "\\" || lastChar === "/") {
-        this.homeService.currentFolderPath = this.homeService.currentFolderPath.substring(0, this.homeService.currentFolderPath.length - 1);
+        tempCurrentFolderPath = tempCurrentFolderPath.substring(0, tempCurrentFolderPath.length - 1);
         numOfSplits--;
       }
 
-      let splitIndex = Math.max(this.homeService.currentFolderPath.lastIndexOf('\\'), this.homeService.currentFolderPath.lastIndexOf('/'));
-      if (numOfSplits === 1)
-        splitIndex++;
-
-      this.homeService.allFiles = false;
-      this.navigate(this.homeService.currentFolderPath.substring(0, splitIndex));
+      const splitIndex: number = Math.max(tempCurrentFolderPath.lastIndexOf('\\'), tempCurrentFolderPath.lastIndexOf('/'));
+      this.navigate(tempCurrentFolderPath.substring(0, numOfSplits === 1 ? splitIndex + 1 : splitIndex));
     }
   }
 
@@ -144,10 +155,27 @@ export class HomeComponent implements OnInit {
     this.getDesktopFilePackage();
   }
 
-  // On click the file option
-  onClickFileOption() {
-    this.homeService.allFiles = !this.homeService.allFiles;
+  // On click the file option button
+  onClickFileOptionButton(allFiles: boolean) {
+    this.homeService.allFiles = allFiles;
     this.getDesktopFilePackage();
+  }
+
+  // On click the searching button
+  onClickSearchingButton() {
+    this.homeService.enableSearching = !this.homeService.enableSearching;
+    this.homeService.updateDesktopFiles();
+  }
+
+  // On input the searching name
+  onInputSearchingName() {
+    this.homeService.updateDesktopFiles();
+  }
+
+  // On click the table header
+  onClickTableHeader(tableHeader: number) {
+    this.homeService.sortingMode = this.homeService.sortingMode === tableHeader ? tableHeader + 1 : tableHeader;
+    this.homeService.updateDesktopFiles();
   }
 
   // On click the table element name
@@ -159,8 +187,8 @@ export class HomeComponent implements OnInit {
     }
   }
 
-  // On click the open file
-  onClickOpenFile(desktopFilePath: string) {
+  // On click the open file button
+  onClickOpenFileButton(desktopFilePath: string) {
     this.openFile(desktopFilePath);
   }
 
@@ -178,42 +206,30 @@ export class HomeComponent implements OnInit {
       );
   }
 
-  // On click the table header
-  onClickTableHeader(tableHeader: number) {
-    this.homeService.sortingMode = this.homeService.sortingMode === tableHeader ? tableHeader + 1 : tableHeader;
-    this.homeService.updateDesktopFiles();
-  }
-
-  // On click the searching button
-  onClickSearchingButton() {
-    this.homeService.enableSearching = !this.homeService.enableSearching;
-    this.homeService.updateDesktopFiles();
-  }
-
-  // On change the searching input
-  onChangeSearchingInput() {
-    this.homeService.updateDesktopFiles();
-  }
-
-  // On click delete file
-  onClickDeleteFile(desktopFile: DesktopFile) {
+  // On click delete file button
+  onClickDeleteFileButton(desktopFile: DesktopFile) {
     TwoButtonModalComponent.executeModal(
       this.modalViewContainerRef,
       "Delete Confirmation", `Are you sure want to delete ${desktopFile.name}`, "Delete this file", "Cancel",
       () => {
-        this.desktopCommunicationService.deleteDesktopFile(desktopFile.absolutePath)
-          .subscribe(
-            (res) => {
-              this.getDesktopFilePackage();
-            },
-            (err) => {
-              OneButtonModalComponent.executeModal(
-                this.modalViewContainerRef,
-                "System Error", (<ErrorPackage>err['error']).message, "OK"
-              );
-            }
-          );
+        this.deleteFile(desktopFile.absolutePath);
       }
     );
+  }
+
+  // Delete the file
+  private deleteFile(desktopFilePath: string) {
+    this.desktopCommunicationService.deleteDesktopFile(desktopFilePath)
+      .subscribe(
+        (res) => {
+          this.getDesktopFilePackage();
+        },
+        (err) => {
+          OneButtonModalComponent.executeModal(
+            this.modalViewContainerRef,
+            "System Error", (<ErrorPackage>err['error']).message, "OK"
+          );
+        }
+      );
   }
 }

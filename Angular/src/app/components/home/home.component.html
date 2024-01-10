@@ -19,11 +19,11 @@
 
 <div class="mb-2">
     <div class="btn-group" role="group">
-        <button class="btn btn-success" (click)="onClickFileOption()" [disabled]="!homeService.allFiles"
+        <button class="btn btn-success" (click)="onClickFileOptionButton(false)" [disabled]="!homeService.allFiles"
             title="Show folders and files within the current folder">
             This Folder
         </button>
-        <button class="btn btn-success" (click)="onClickFileOption()" [disabled]="homeService.allFiles"
+        <button class="btn btn-success" (click)="onClickFileOptionButton(true)" [disabled]="homeService.allFiles"
             title="Show all files under the current folder">
             All Files
         </button>
@@ -36,7 +36,7 @@
     </button>
     @if (homeService.enableSearching) {
     <h6>Search By Name</h6>
-    <input type="text" class="form-control" [(ngModel)]="homeService.searchingInput" (input)="onChangeSearchingInput()">
+    <input type="text" class="form-control" [(ngModel)]="homeService.searchingName" (input)="onInputSearchingName()">
     }
 </div>
 
@@ -52,7 +52,7 @@
     <thead>
         <tr>
             <th style="width: 54%;" (click)="onClickTableHeader(0)">
-                Name ({{ homeService.desktopFiles.length }})
+                Name ({{ homeService.desktopFiles1000.length }})
                 <i class="bi bi-caret-down-fill" [hidden]="homeService.sortingMode !== 0"></i>
                 <i class="bi bi-caret-up-fill" [hidden]="homeService.sortingMode !== 1"></i>
             </th>
@@ -77,7 +77,7 @@
         </tr>
     </thead>
     <tbody>
-        @for (desktopFile of homeService.desktopFiles; track $index) {
+        @for (desktopFile of homeService.desktopFiles1000; track $index) {
         <tr [ngClass]="{ 'table-light': desktopFile.isFolder}">
             <td title="{{ desktopFile.absolutePath }}" (click)="onClickTableElementName(desktopFile)">
                 {{ desktopFile.name }}
@@ -93,11 +93,11 @@
             </td>
             <td class="text-center">
                 @if (desktopFile.isFolder) {
-                    <i class="bi bi-folder mx-2" title="Open folder" (click)="onClickOpenFile(desktopFile.absolutePath)"></i>
+                    <i class="bi bi-folder mx-2" title="Open folder" (click)="onClickOpenFileButton(desktopFile.absolutePath)"></i>
                 } @else {
-                    <i class="bi bi-file-earmark mx-2" title="Open file" (click)="onClickOpenFile(desktopFile.absolutePath)"></i>
-                    <i class="bi bi-folder mx-2" title="Show in folder" (click)="onClickOpenFile(desktopFile.parentFolderPath)"></i>
-                    <i class="bi bi-trash mx-2" title="Delete file" (click)="onClickDeleteFile(desktopFile)"></i>
+                    <i class="bi bi-file-earmark mx-2" title="Open file" (click)="onClickOpenFileButton(desktopFile.absolutePath)"></i>
+                    <i class="bi bi-folder mx-2" title="Show in folder" (click)="onClickOpenFileButton(desktopFile.parentFolderPath)"></i>
+                    <i class="bi bi-trash mx-2" title="Delete file" (click)="onClickDeleteFileButton(desktopFile)"></i>
                 }
             </td>
         </tr>

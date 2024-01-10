@@ -9,10 +9,10 @@ export class SettingsService {
   private readonly DEFAULT_FOLDER_PATH_KEY: string = 'DEFAULT_FOLDER_PATH';
   private readonly SHOW_HIDDEN_KEY: string = 'SHOW_HIDDEN';
 
-  // Default Values
+  // Default values
   private readonly DEFAULT_FOLDER_PATH: string = 'C:\\';
 
-  // Persistent data
+  // Internal data
   private _isInitialized: boolean = false;
   private _defaultFolderPath: string = "";
   private _showHidden: boolean = false;

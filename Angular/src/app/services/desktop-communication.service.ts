@@ -6,7 +6,7 @@ import { Injectable } from '@angular/core';
 })
 export class DesktopCommunicationService {
 
-  // Server Data
+  // Server data
   private readonly SERVER_URL: string = 'http://localhost:8080/';
   private readonly GET_DESKTOP_FILE_PACKAGE_URL: string = 'getDesktopFilePackage';
   private readonly OPEN_DESKTOP_FILE_URL: string = 'openDesktopFile';
