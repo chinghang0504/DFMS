@@ -1,8 +1,8 @@
-<h3>Home</h3>
+<h3 class="my-2">Home</h3>
 
 <div class="form-group mb-2">
     <label for="">Current Folder: </label>
-    <div class="input-group dropdown">
+    <div class="input-group">
         <input type="text" class="form-control" [(ngModel)]="homeService.currentFolderPath"
             (change)="onChangeCurrentFolderPath()">
         <button class="btn btn-outline-secondary" type="button" (click)="onClickParentButton()" title="Parent Folder">
@@ -17,7 +17,7 @@
     </div>
 </div>
 
-<div class="mb-2">
+<div class="mb-3">
     <div class="btn-group" role="group">
         <button class="btn btn-success" (click)="onClickFileOptionButton(false)" [disabled]="!homeService.allFiles"
             title="Show folders and files within the current folder">
@@ -30,80 +30,115 @@
     </div>
 </div>
 
-<div class="mb-2">
+<div class="mb-3">
     <button class="btn btn-outline-primary" (click)="onClickSearchingButton()">
         {{ homeService.enableSearching ? 'Disable Searching' : 'Enable Searching' }}
     </button>
+    <span class="mx-3" [hidden]="loading || errorMessage">{{ homeService.size }} results found</span>
     @if (homeService.enableSearching) {
-    <h6>Search By Name</h6>
-    <input type="text" class="form-control" [(ngModel)]="homeService.searchingName" (input)="onInputSearchingName()">
+    <div>
+        <label for="searchingName">Search By Name</label>
+        <input type="text" class="form-control" id="searchingName" [(ngModel)]="homeService.searchingName"
+            (input)="onInputSearchingName()">
+    </div>
     }
 </div>
 
-@if (loading) {
-<p>Loading...</p>
-} @else if (errorMessage) {
-<div class="alert alert-danger d-flex align-items-center fade show">
-    <i class="bi-exclamation-octagon-fill"></i>
-    <strong class="mx-2">Error!</strong>{{ errorMessage }}
-</div>
-} @else {
-<table class="table table-hover">
-    <thead>
-        <tr>
-            <th style="width: 54%;" (click)="onClickTableHeader(0)">
-                Name ({{ homeService.desktopFiles1000.length }})
-                <i class="bi bi-caret-down-fill" [hidden]="homeService.sortingMode !== 0"></i>
-                <i class="bi bi-caret-up-fill" [hidden]="homeService.sortingMode !== 1"></i>
-            </th>
-            <th class="text-center" style="width: 15%;" (click)="onClickTableHeader(2)">
-                Last modified
-                <i class="bi bi-caret-down-fill" [hidden]="homeService.sortingMode !== 2"></i>
-                <i class="bi bi-caret-up-fill" [hidden]="homeService.sortingMode !== 3"></i>
-            </th>
-            <th class="text-center" style="width: 8%;" (click)="onClickTableHeader(4)">
-                Type
-                <i class="bi bi-caret-down-fill" [hidden]="homeService.sortingMode !== 4"></i>
-                <i class="bi bi-caret-up-fill" [hidden]="homeService.sortingMode !== 5"></i>
-            </th>
-            <th class="text-center" style="width: 10%;" (click)="onClickTableHeader(6)">
-                Size
-                <i class="bi bi-caret-down-fill" [hidden]="homeService.sortingMode !== 6"></i>
-                <i class="bi bi-caret-up-fill" [hidden]="homeService.sortingMode !== 7"></i>
-            </th>
-            <th class="text-center" style="width: 13%;">
-                Actions
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-        @for (desktopFile of homeService.desktopFiles1000; track $index) {
-        <tr [ngClass]="{ 'table-light': desktopFile.isFolder}">
-            <td title="{{ desktopFile.absolutePath }}" (click)="onClickTableElementName(desktopFile)">
-                {{ desktopFile.name }}
-            </td>
-            <td class="text-center">
-                {{ desktopFile.lastModified | date:'yyyy/MM/dd/ hh:mm' }}
-            </td>
-            <td class="text-center">
-                {{ desktopFile.extension }}
-            </td>
-            <td class="text-end">
-                {{ desktopFile | byteSize }}
-            </td>
-            <td class="text-center">
-                @if (desktopFile.isFolder) {
-                    <i class="bi bi-folder mx-2" title="Open folder" (click)="onClickOpenFileButton(desktopFile.absolutePath)"></i>
-                } @else {
-                    <i class="bi bi-file-earmark mx-2" title="Open file" (click)="onClickOpenFileButton(desktopFile.absolutePath)"></i>
-                    <i class="bi bi-folder mx-2" title="Show in folder" (click)="onClickOpenFileButton(desktopFile.parentFolderPath)"></i>
+<div class="mb-3">
+    @if (loading) {
+    <p>Loading...</p>
+    } @else if (errorMessage) {
+    <div class="alert alert-danger d-flex align-items-center fade show">
+        <i class="bi-exclamation-octagon-fill"></i>
+        <strong class="mx-2">Error!</strong>{{ errorMessage }}
+    </div>
+    } @else {
+    @if (homeService.totalPageNumber != 1) {
+    <div class="col-md-2 mb-1">
+        <div class="input-group">
+            <span class="input-group-text" id="basic-addon1">Page</span>
+            <input type="text" class="form-control" id="pageNumber" [(ngModel)]="homeService.currentPageNumber"
+                (change)="onInputChangePage()">
+        </div>
+    </div>
+    <div class="text-center">
+        <button class="btn btn-outline-secondary mx-2" [ngClass]="{ 'invisible': homeService.currentPageNumber === 1 }"
+            (click)="onClickChangePage(true)">Previous Page</button>
+        <button class="btn btn-outline-secondary mx-2"
+            [ngClass]="{ 'invisible': homeService.currentPageNumber === homeService.totalPageNumber}"
+            (click)="onClickChangePage(false)">Next Page</button>
+    </div>
+    }
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th style="width: 54%;" (click)="onClickTableHeader(0)">
+                    Name ({{ homeService.desktopFiles1000.length }})
+                    <i class="bi bi-caret-down-fill" [hidden]="homeService.sortingMode !== 0"></i>
+                    <i class="bi bi-caret-up-fill" [hidden]="homeService.sortingMode !== 1"></i>
+                </th>
+                <th class="text-center" style="width: 15%;" (click)="onClickTableHeader(2)">
+                    Last modified
+                    <i class="bi bi-caret-down-fill" [hidden]="homeService.sortingMode !== 2"></i>
+                    <i class="bi bi-caret-up-fill" [hidden]="homeService.sortingMode !== 3"></i>
+                </th>
+                <th class="text-center" style="width: 8%;" (click)="onClickTableHeader(4)">
+                    Type
+                    <i class="bi bi-caret-down-fill" [hidden]="homeService.sortingMode !== 4"></i>
+                    <i class="bi bi-caret-up-fill" [hidden]="homeService.sortingMode !== 5"></i>
+                </th>
+                <th class="text-center" style="width: 10%;" (click)="onClickTableHeader(6)">
+                    Size
+                    <i class="bi bi-caret-down-fill" [hidden]="homeService.sortingMode !== 6"></i>
+                    <i class="bi bi-caret-up-fill" [hidden]="homeService.sortingMode !== 7"></i>
+                </th>
+                <th class="text-center" style="width: 13%;">
+                    Actions
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (desktopFile of homeService.desktopFiles1000; track $index) {
+            <tr [ngClass]="{ 'table-light': desktopFile.isFolder}">
+                <td title="{{ desktopFile.absolutePath }}" (click)="onClickTableElementName(desktopFile)">
+                    {{ desktopFile.name }}
+                </td>
+                <td class="text-center">
+                    {{ desktopFile.lastModified | date:'yyyy/MM/dd/ hh:mm' }}
+                </td>
+                <td class="text-center">
+                    {{ desktopFile.extension }}
+                </td>
+                <td class="text-end">
+                    {{ desktopFile | byteSize }}
+                </td>
+                <td class="text-center">
+                    @if (desktopFile.isFolder) {
+                    <i class="bi bi-folder mx-2" title="Open folder"
+                        (click)="onClickOpenFileButton(desktopFile.absolutePath)"></i>
+                    } @else {
+                    <i class="bi bi-file-earmark mx-2" title="Open file"
+                        (click)="onClickOpenFileButton(desktopFile.absolutePath)"></i>
+                    <i class="bi bi-folder mx-2" title="Show in folder"
+                        (click)="onClickOpenFileButton(desktopFile.parentFolderPath)"></i>
                     <i class="bi bi-trash mx-2" title="Delete file" (click)="onClickDeleteFileButton(desktopFile)"></i>
-                }
-            </td>
-        </tr>
-        }
-    </tbody>
-</table>
-}
+                    }
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table>
+    @if (homeService.totalPageNumber != 1) {
+    <div class="text-center">
+        <button class="btn btn-outline-secondary mx-2" [ngClass]="{ 'invisible': homeService.currentPageNumber === 1 }"
+            (click)="onClickChangePage(true)">Previous Page</button>
+        <button class="btn btn-outline-secondary mx-2"
+            [ngClass]="{ 'invisible': homeService.currentPageNumber === homeService.totalPageNumber}"
+            (click)="onClickChangePage(false)">Next Page</button>
+    </div>
+    }
+    }
+</div>
+
 
 <ng-template #modalContainer></ng-template>

@@ -9,13 +9,13 @@ import * as bootstrap from "bootstrap";
 })
 export class OneButtonModalComponent {
 
-  // UI Data
+  // UI data
   @ViewChild('oneButtonModal') modalElementRef: ElementRef;
   modalTitle: string;
   modalMessage: string;
   trueButtonTitle: string;
 
-  // Internal Data
+  // Internal data
   private modalEventEmitter: EventEmitter<boolean>;
 
   // Injection

@@ -17,7 +17,7 @@ import { TwoButtonModalComponent } from '../two-button-modal/two-button-modal.co
 })
 export class HomeComponent implements OnInit {
 
-  // UI Data
+  // UI data
   loading: boolean = true;
   errorMessage: string = "";
   @ViewChild('modalContainer', { read: ViewContainerRef }) modalViewContainerRef: ViewContainerRef;
@@ -28,7 +28,7 @@ export class HomeComponent implements OnInit {
     private settingsService: SettingsService, private desktopCommunicationService: DesktopCommunicationService,
     private activatedRoute: ActivatedRoute, private router: Router) { }
 
-  // Internal Data
+  // Internal data
   private _subscription: Subscription;
 
   // On init
@@ -39,6 +39,7 @@ export class HomeComponent implements OnInit {
 
         if (queryParamsPath) {
           this.homeService.currentFolderPath = queryParamsPath;
+          this.homeService.allFiles = false;
           this.getDesktopFilePackage();
         } else {
           this.homeService.currentFolderPath ? this.navigateCurrentFolderPath() : this.navigateDefaultFolderPath();
@@ -101,8 +102,6 @@ export class HomeComponent implements OnInit {
 
   // On click the parent button
   onClickParentButton() {
-    this.homeService.allFiles = false;
-
     const regExpMatchArray: RegExpMatchArray = this.homeService.currentFolderPath.match(/[\\\/]/g);
     let numOfSplits: number = regExpMatchArray ? regExpMatchArray.length : 0;
 
@@ -112,6 +111,7 @@ export class HomeComponent implements OnInit {
 
       // The last character is a split
       if (lastChar === "\\" || lastChar === "/") {
+        this.homeService.allFiles = false;
         this.getDesktopFilePackage();
       }
       // The last character is not a split
@@ -141,9 +141,8 @@ export class HomeComponent implements OnInit {
 
   // On click the default button
   onClickDefaultButton() {
-    this.homeService.allFiles = false;
-
     if (this.homeService.currentFolderPath === this.settingsService.defaultFolderPath) {
+      this.homeService.allFiles = false;
       this.getDesktopFilePackage();
     } else {
       this.navigateDefaultFolderPath();
@@ -231,5 +230,19 @@ export class HomeComponent implements OnInit {
           );
         }
       );
+  }
+
+  // On click change the page
+  onClickChangePage(left: boolean) {
+    if (left) {
+      this.homeService.updatePage(this.homeService.currentPageNumber - 1);
+    } else {
+      this.homeService.updatePage(this.homeService.currentPageNumber + 1);
+    }
+  }
+
+  // On input change the page
+  onInputChangePage() {
+    this.homeService.updatePage(this.homeService.currentPageNumber);
   }
 }

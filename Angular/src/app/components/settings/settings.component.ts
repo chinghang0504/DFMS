@@ -9,7 +9,7 @@ import { TwoButtonModalComponent } from '../two-button-modal/two-button-modal.co
 })
 export class SettingsComponent {
 
-  // UI Data
+  // UI data
   defaultFolderPath: string = "";
   showHidden: boolean = false;
   @ViewChild('modalContainer', { read: ViewContainerRef }) modalViewContainerRef: ViewContainerRef;

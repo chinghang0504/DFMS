@@ -9,14 +9,14 @@ import * as bootstrap from "bootstrap";
 })
 export class TwoButtonModalComponent {
 
-  // UI Data
+  // UI data
   @ViewChild('twoButtonModal') modalElementRef: ElementRef;
   modalTitle: string;
   modalMessage: string;
   trueButtonTitle: string;
   falseButtonTitle: string;
 
-  // Internal Data
+  // Internal data
   private modalEventEmitter: EventEmitter<boolean>;
 
   // Injection

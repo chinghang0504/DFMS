@@ -25,6 +25,8 @@ export class HomeService {
   searchingName: string = "";
   sortingMode: SortingMode = SortingMode.NAME_ASCENDING;
   desktopFiles1000: DesktopFile[] = [];
+  currentPageNumber: number = 1;
+  totalPageNumber: number = 1;
 
   // Internal data
   private _folderList: DesktopFile[];
@@ -35,9 +37,15 @@ export class HomeService {
   // Injection
   constructor(private settingsService: SettingsService) { }
 
+  // Getters
+  get size() {
+    return this._desktopFiles.length;
+  }
+
   // Clear data
   clearData() {
     this.desktopFiles1000 = [];
+    
     this._folderList = [];
     this._fileList = [];
     this._desktopFiles = [];
@@ -50,6 +58,8 @@ export class HomeService {
       this._folderList = desktopFilePackage.folderList;
       this._fileList = desktopFilePackage.fileList;
     }
+
+    this._worker?.terminate();
 
     const workerData: WorkerData = {
       folderList: this._folderList,
@@ -66,6 +76,9 @@ export class HomeService {
 
       this._worker.onmessage = ({ data }) => {
         this._desktopFiles = data;
+
+        this.totalPageNumber = Math.ceil(this._desktopFiles.length / 1000);
+        this.currentPageNumber = 1;
         this.desktopFiles1000 = this._desktopFiles.slice(0, 1000);
       };
 
@@ -74,6 +87,7 @@ export class HomeService {
     // Non-workder
     else {
       this._desktopFiles = HomeService.filterAndSortDesktopFiles(workerData);
+
       this.desktopFiles1000 = this._desktopFiles.slice(0, 1000);
     }
   }
@@ -136,5 +150,20 @@ export class HomeService {
         return (a.size - b.size) * factor;
       });
     }
+  }
+
+  // Update the page
+  updatePage(pageNumber: number) {
+    if (pageNumber < 1) {
+      this.currentPageNumber = 1;
+    } else if (pageNumber > this.totalPageNumber) {
+      this.currentPageNumber = this.totalPageNumber;
+    } else {
+      this.currentPageNumber = pageNumber;
+    }
+
+    const startIndex: number = (this.currentPageNumber - 1) * 1000;
+    const endIndex: number = this.currentPageNumber * 1000;
+    this.desktopFiles1000 = this._desktopFiles.slice(startIndex, endIndex);
   }
 }
