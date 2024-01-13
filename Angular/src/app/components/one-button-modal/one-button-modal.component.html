@@ -3,17 +3,21 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h1 class="modal-title fs-5" id="oneButtonModalLabel">{{ modalTitle }}</h1>
+                <h1 class="modal-title fs-5" id="oneButtonModalLabel">
+                    {{ modalTitle }}
+                </h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
-                    (click)="onClickModalButton(false)"></button>
+                    (click)="onClickModalButton(false)">
+                </button>
             </div>
             <div class="modal-body">
-                {{ modalMessage }}
+                <p>{{ modalBody }}</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
-                    (click)="onClickModalButton(true)">{{
-                    trueButtonTitle }}</button>
+                    (click)="onClickModalButton(true)">
+                    {{ trueButtonText }}
+                </button>
             </div>
         </div>
     </div>

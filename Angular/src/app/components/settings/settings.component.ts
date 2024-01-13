@@ -1,6 +1,6 @@
-import { Component, ViewChild, ViewContainerRef } from '@angular/core';
+import { Component } from '@angular/core';
 import { SettingsService } from '../../services/settings.service';
-import { TwoButtonModalComponent } from '../two-button-modal/two-button-modal.component';
+import { ModalService } from '../../services/modal.service';
 
 @Component({
   selector: 'app-settings',
@@ -10,12 +10,11 @@ import { TwoButtonModalComponent } from '../two-button-modal/two-button-modal.co
 export class SettingsComponent {
 
   // UI data
-  defaultFolderPath: string = "";
+  homeFolderPath: string = '';
   showHidden: boolean = false;
-  @ViewChild('modalContainer', { read: ViewContainerRef }) modalViewContainerRef: ViewContainerRef;
 
   // Injection
-  constructor(private settingsService: SettingsService) { }
+  constructor(private settingsService: SettingsService, private modalService: ModalService) { }
 
   // On init
   ngOnInit() {
@@ -24,27 +23,24 @@ export class SettingsComponent {
 
   // Update the UI data from the settings
   updateUIData() {
-    this.defaultFolderPath = this.settingsService.defaultFolderPath;
+    this.homeFolderPath = this.settingsService.homeFolderPath;
     this.showHidden = this.settingsService.showHidden;
   }
 
   // On click the save button
-  onClickSave() {
-    TwoButtonModalComponent.executeModal(
-      this.modalViewContainerRef,
-      "Save Confirmation", "Do you want to save changes?", "Save changes", "Cancel",
+  onClickSaveButton() {
+    this.modalService.executeTwoButtonModal(
+      'Save Confirmation', 'Do you want to save changes?', 'Save', 'Cancel',
       () => {
-        this.settingsService.saveSettings(this.defaultFolderPath, this.showHidden);
-        this.updateUIData();
+        this.settingsService.saveSettings(this.homeFolderPath, this.showHidden);
       }
     );
   }
 
   // On click the reset button
-  onClickReset() {
-    TwoButtonModalComponent.executeModal(
-      this.modalViewContainerRef,
-      "Reset Confirmation", "Do you want to reset to default?", "Reset to default", "Cancel",
+  onClickResetButton() {
+    this.modalService.executeTwoButtonModal(
+      'Reset Confirmation', 'Do you want to reset to default?', 'Reset', 'Cancel',
       () => {
         this.settingsService.resetSettings();
         this.updateUIData();

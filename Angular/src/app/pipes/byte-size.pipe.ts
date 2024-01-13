@@ -8,7 +8,7 @@ export class ByteSizePipe implements PipeTransform {
 
   transform(desktopFile: DesktopFile): string {
     if (desktopFile.isFolder)
-      return "";
+      return '';
     else
       return Math.ceil(desktopFile.size / 1024) + ' KB';
   }

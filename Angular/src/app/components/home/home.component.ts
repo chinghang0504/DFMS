@@ -1,14 +1,14 @@
-import { Component, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { HomeService } from '../../services/home.service';
 import { DesktopFile } from '../../models/desktop-file';
 import { DesktopFilePackage } from '../../models/desktop-file-package';
 import { ErrorPackage } from '../../models/error-package';
-import { OneButtonModalComponent } from '../one-button-modal/one-button-modal.component';
 import { SettingsService } from '../../services/settings.service';
 import { DesktopCommunicationService } from '../../services/desktop-communication.service';
-import { Subscription, finalize } from 'rxjs';
-import { TwoButtonModalComponent } from '../two-button-modal/two-button-modal.component';
+import { TagsService } from '../../services/tags.service';
+import { ModalService } from '../../services/modal.service';
 
 @Component({
   selector: 'app-home',
@@ -17,15 +17,10 @@ import { TwoButtonModalComponent } from '../two-button-modal/two-button-modal.co
 })
 export class HomeComponent implements OnInit {
 
-  // UI data
-  loading: boolean = true;
-  errorMessage: string = "";
-  @ViewChild('modalContainer', { read: ViewContainerRef }) modalViewContainerRef: ViewContainerRef;
-
   // Injection
   constructor(
-    public homeService: HomeService,
-    private settingsService: SettingsService, private desktopCommunicationService: DesktopCommunicationService,
+    public homeService: HomeService, public tagsService: TagsService,
+    private settingsService: SettingsService, private desktopCommunicationService: DesktopCommunicationService, private modalService: ModalService,
     private activatedRoute: ActivatedRoute, private router: Router) { }
 
   // Internal data
@@ -63,22 +58,19 @@ export class HomeComponent implements OnInit {
 
   // Navigate the default foler path
   private navigateDefaultFolderPath() {
-    this.navigate(this.settingsService.defaultFolderPath);
+    this.navigate(this.settingsService.homeFolderPath);
   }
 
   // Get a desktop file package
   private getDesktopFilePackage() {
-    this.loading = true;
-    this.errorMessage = "";
+    this.homeService.loading = true;
+    this.homeService.errorMessage = "";
     this.homeService.clearData();
 
     // Unsubscribe the previous get request
     this._subscription?.unsubscribe();
 
     this._subscription = this.desktopCommunicationService.getDesktopFilePackage(this.homeService.currentFolderPath, this.homeService.allFiles)
-      .pipe(finalize(() => {
-        this.loading = false;
-      }))
       .subscribe(
         (res: DesktopFilePackage) => {
           console.log('Receiving a desktop file package...');
@@ -87,10 +79,12 @@ export class HomeComponent implements OnInit {
           this.homeService.updateDesktopFiles(res);
         }, (err) => {
           if (err['status'] === 400) {
-            this.errorMessage = (<ErrorPackage>err['error']).message;
+            this.homeService.errorMessage = (<ErrorPackage>err['error']).message;
           } else {
-            this.errorMessage = "Unable to connect to the desktop.";
+            this.homeService.errorMessage = "Unable to connect to the desktop.";
           }
+
+          this.homeService.loading = false;
         }
       );
   }
@@ -141,7 +135,7 @@ export class HomeComponent implements OnInit {
 
   // On click the default button
   onClickDefaultButton() {
-    if (this.homeService.currentFolderPath === this.settingsService.defaultFolderPath) {
+    if (this.homeService.currentFolderPath === this.settingsService.homeFolderPath) {
       this.homeService.allFiles = false;
       this.getDesktopFilePackage();
     } else {
@@ -197,8 +191,7 @@ export class HomeComponent implements OnInit {
       .subscribe(
         (res) => { },
         (err) => {
-          OneButtonModalComponent.executeModal(
-            this.modalViewContainerRef,
+          this.modalService.executeOneButtonModal(
             "System Error", (<ErrorPackage>err['error']).message, "OK"
           );
         }
@@ -207,8 +200,7 @@ export class HomeComponent implements OnInit {
 
   // On click delete file button
   onClickDeleteFileButton(desktopFile: DesktopFile) {
-    TwoButtonModalComponent.executeModal(
-      this.modalViewContainerRef,
+    this.modalService.executeTwoButtonModal(
       "Delete Confirmation", `Are you sure want to delete ${desktopFile.name}`, "Delete this file", "Cancel",
       () => {
         this.deleteFile(desktopFile.absolutePath);
@@ -224,8 +216,7 @@ export class HomeComponent implements OnInit {
           this.getDesktopFilePackage();
         },
         (err) => {
-          OneButtonModalComponent.executeModal(
-            this.modalViewContainerRef,
+          this.modalService.executeOneButtonModal(
             "System Error", (<ErrorPackage>err['error']).message, "OK"
           );
         }
@@ -245,4 +236,10 @@ export class HomeComponent implements OnInit {
   onInputChangePage() {
     this.homeService.updatePage(this.homeService.currentPageNumber);
   }
+
+  // // On click the tag button
+  // onClickTagButton(elementRef: ElementRef ,tag: string) {
+  //   // (elementRef.nativeElement as HTMLElement)
+  //   console.log(tag);
+  // }
 }

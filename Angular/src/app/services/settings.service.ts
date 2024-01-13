@@ -5,21 +5,18 @@ import { Injectable } from '@angular/core';
 })
 export class SettingsService {
 
-  // Keys
-  private readonly DEFAULT_FOLDER_PATH_KEY: string = 'DEFAULT_FOLDER_PATH';
+  // Keys and values
+  private readonly HOME_FOLDER_PATH_KEY: string = 'HOME_FOLDER_PATH';
   private readonly SHOW_HIDDEN_KEY: string = 'SHOW_HIDDEN';
-
-  // Default values
-  private readonly DEFAULT_FOLDER_PATH: string = 'C:\\';
+  private readonly DEFAULT_HOME_FOLDER_PATH: string = 'C:\\';
 
   // Internal data
-  private _isInitialized: boolean = false;
-  private _defaultFolderPath: string = "";
+  private _homeFolderPath: string = '';
   private _showHidden: boolean = false;
 
   // Getters
-  get defaultFolderPath() {
-    return this._defaultFolderPath;
+  get homeFolderPath() {
+    return this._homeFolderPath;
   }
   get showHidden() {
     return this._showHidden;
@@ -27,20 +24,16 @@ export class SettingsService {
 
   // Load settings from the local storage
   loadSettings() {
-    if (!this._isInitialized) {
-      const defaultFolderPath: string = window.localStorage.getItem(this.DEFAULT_FOLDER_PATH_KEY);
-      this._defaultFolderPath = defaultFolderPath ? defaultFolderPath : this.DEFAULT_FOLDER_PATH;
+    const homeFolderPath: string = window.localStorage.getItem(this.HOME_FOLDER_PATH_KEY);
+    this._homeFolderPath = homeFolderPath ? homeFolderPath : this.DEFAULT_HOME_FOLDER_PATH;
 
-      this._showHidden = window.localStorage.getItem(this.SHOW_HIDDEN_KEY) === 'true';
-
-      this._isInitialized = true;
-    }
+    this._showHidden = window.localStorage.getItem(this.SHOW_HIDDEN_KEY) === 'true';
   }
 
   // Save settings into the local storage
-  saveSettings(defaultFolderPath: string, showHidden: boolean) {
-    window.localStorage.setItem(this.DEFAULT_FOLDER_PATH_KEY, defaultFolderPath);
-    this._defaultFolderPath = defaultFolderPath;
+  saveSettings(homeFolderPath: string, showHidden: boolean) {
+    window.localStorage.setItem(this.HOME_FOLDER_PATH_KEY, homeFolderPath);
+    this._homeFolderPath = homeFolderPath;
 
     window.localStorage.setItem(this.SHOW_HIDDEN_KEY, showHidden ? 'true' : 'false');
     this._showHidden = showHidden;
@@ -48,6 +41,6 @@ export class SettingsService {
 
   // Reset settings
   resetSettings() {
-    this.saveSettings(this.DEFAULT_FOLDER_PATH, false);
+    this.saveSettings(this.DEFAULT_HOME_FOLDER_PATH, false);
   }
 }

@@ -1,5 +1,4 @@
-import { ChangeDetectorRef, Component, ElementRef, EventEmitter, ViewChild, ViewContainerRef } from '@angular/core';
-import { take } from 'rxjs';
+import { ChangeDetectorRef, Component, ElementRef, EventEmitter, ViewChild } from '@angular/core';
 import * as bootstrap from "bootstrap";
 
 @Component({
@@ -12,51 +11,33 @@ export class OneButtonModalComponent {
   // UI data
   @ViewChild('oneButtonModal') modalElementRef: ElementRef;
   modalTitle: string;
-  modalMessage: string;
-  trueButtonTitle: string;
+  modalBody: string;
+  trueButtonText: string;
 
   // Internal data
-  private modalEventEmitter: EventEmitter<boolean>;
+  private _modalEventEmitter: EventEmitter<boolean>;
 
   // Injection
   constructor(private changeDetectorRef: ChangeDetectorRef) { }
 
   // Set the modal
-  private setModal(modalTitle: string, modalMessage: string, trueButtonTitle: string): EventEmitter<boolean> {
+  setModal(modalTitle: string, modalBody: string, trueButtonText: string): EventEmitter<boolean> {
     this.modalTitle = modalTitle;
-    this.modalMessage = modalMessage;
-    this.trueButtonTitle = trueButtonTitle;
+    this.modalBody = modalBody;
+    this.trueButtonText = trueButtonText;
 
     this.changeDetectorRef.detectChanges();
 
-    return this.modalEventEmitter = new EventEmitter<boolean>();
+    return this._modalEventEmitter = new EventEmitter<boolean>();
   }
 
   // Show the modal
-  private showModal() {
+  showModal() {
     $(this.modalElementRef.nativeElement).modal('show');
   }
 
   // On click the modal button
   onClickModalButton(result: boolean) {
-    this.modalEventEmitter.emit(result);
-  }
-
-  // Execute the modal
-  static executeModal(
-    modalViewContainerRef: ViewContainerRef,
-    modalTitle: string, modalMessage: string, trueButtonTitle: string,
-    trueCallback?: () => void, falseCallback?: () => void) {
-    const modalComponent: OneButtonModalComponent = modalViewContainerRef.createComponent(OneButtonModalComponent).instance;
-
-    modalComponent.setModal(modalTitle, modalMessage, trueButtonTitle)
-      .pipe(take(1))
-      .subscribe((value: boolean) => {
-        value ? trueCallback?.() : falseCallback?.();
-
-        modalViewContainerRef.clear();
-      });
-
-    modalComponent.showModal();
+    this._modalEventEmitter.emit(result);
   }
 }

@@ -5,12 +5,12 @@ import { DesktopFilePackage } from '../models/desktop-file-package';
 import { SortingMode } from '../models/sorting-mode';
 
 interface WorkerData {
-  folderList: DesktopFile[], 
-  fileList: DesktopFile[], 
-  showHidden: boolean, 
-  enableSearching: boolean, 
-  searchingName: string, 
-  sortingMode: SortingMode
+  folderList: DesktopFile[],
+  fileList: DesktopFile[],
+  showHidden: boolean,
+  enableSearching: boolean,
+  searchingName: string,
+  sortingMode: SortingMode;
 }
 
 @Injectable({
@@ -19,6 +19,8 @@ interface WorkerData {
 export class HomeService {
 
   // UI data
+  loading: boolean = true;
+  errorMessage: string = "";
   currentFolderPath: string = "";
   allFiles: boolean = false;
   enableSearching: boolean = false;
@@ -39,13 +41,13 @@ export class HomeService {
 
   // Getters
   get size() {
-    return this._desktopFiles.length;
+    return this._desktopFiles?.length;
   }
 
   // Clear data
   clearData() {
     this.desktopFiles1000 = [];
-    
+
     this._folderList = [];
     this._fileList = [];
     this._desktopFiles = [];
@@ -80,6 +82,7 @@ export class HomeService {
         this.totalPageNumber = Math.ceil(this._desktopFiles.length / 1000);
         this.currentPageNumber = 1;
         this.desktopFiles1000 = this._desktopFiles.slice(0, 1000);
+        this.loading = false;
       };
 
       this._worker.postMessage(workerData);
@@ -88,7 +91,10 @@ export class HomeService {
     else {
       this._desktopFiles = HomeService.filterAndSortDesktopFiles(workerData);
 
+      this.totalPageNumber = Math.ceil(this._desktopFiles.length / 1000);
+      this.currentPageNumber = 1;
       this.desktopFiles1000 = this._desktopFiles.slice(0, 1000);
+      this.loading = false;
     }
   }
 

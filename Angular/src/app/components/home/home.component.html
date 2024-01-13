@@ -1,4 +1,4 @@
-<h3 class="my-2">Home</h3>
+<h3 class="my-3">Home</h3>
 
 <div class="form-group mb-2">
     <label for="">Current Folder: </label>
@@ -30,43 +30,62 @@
     </div>
 </div>
 
-<div class="mb-3">
+<div class="mb-4">
     <button class="btn btn-outline-primary" (click)="onClickSearchingButton()">
         {{ homeService.enableSearching ? 'Disable Searching' : 'Enable Searching' }}
     </button>
-    <span class="mx-3" [hidden]="loading || errorMessage">{{ homeService.size }} results found</span>
+    <span class="mx-3" [hidden]="homeService.loading || homeService.errorMessage">{{ homeService.size }} results found</span>
     @if (homeService.enableSearching) {
-    <div>
-        <label for="searchingName">Search By Name</label>
+    <div class="mb-2">
+        <label for="searchingName">Search by name</label>
         <input type="text" class="form-control" id="searchingName" [(ngModel)]="homeService.searchingName"
             (input)="onInputSearchingName()">
     </div>
+    <!-- <div>
+        <label>Search by tags</label>
+        @if (tagsService.tags.length === 0) {
+        <p class="mx-3">There is no any tags.</p>
+        } @else {
+        <div>
+            @for (tag of tagsService.tags; track $index) {
+            <button class="btn btn-outline-secondary mx-1 rounded-pill" (click)="onClickTagButton(tagButton, tag)"
+                #tagButton>{{ tag }}</button>
+            }
+        </div>
+        }
+    </div> -->
     }
 </div>
 
 <div class="mb-3">
-    @if (loading) {
+    @if (homeService.loading) {
     <p>Loading...</p>
-    } @else if (errorMessage) {
+    } @else if (homeService.errorMessage) {
     <div class="alert alert-danger d-flex align-items-center fade show">
         <i class="bi-exclamation-octagon-fill"></i>
-        <strong class="mx-2">Error!</strong>{{ errorMessage }}
+        <strong class="mx-2">Error!</strong>{{ homeService.errorMessage }}
     </div>
     } @else {
     @if (homeService.totalPageNumber != 1) {
-    <div class="col-md-2 mb-1">
-        <div class="input-group">
-            <span class="input-group-text" id="basic-addon1">Page</span>
-            <input type="text" class="form-control" id="pageNumber" [(ngModel)]="homeService.currentPageNumber"
-                (change)="onInputChangePage()">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-2">
+                <div class="input-group">
+                    <span class="input-group-text" id="basic-addon1">Page</span>
+                    <input type="text" style="text-align: right;" class="form-control" id="pageNumber" [(ngModel)]="homeService.currentPageNumber"
+                        (change)="onInputChangePage()">
+                        <span class="input-group-text" id="basic-addon1">/ {{ homeService.totalPageNumber }}</span>
+                </div>
+            </div>
+            <div class="col-md-10 text-end">
+                <button class="btn btn-outline-secondary mx-2"
+                    [ngClass]="{ 'invisible': homeService.currentPageNumber === 1 }"
+                    (click)="onClickChangePage(true)">Previous Page</button>
+                <button class="btn btn-outline-secondary mx-2"
+                    [ngClass]="{ 'invisible': homeService.currentPageNumber === homeService.totalPageNumber}"
+                    (click)="onClickChangePage(false)">Next Page</button>
+            </div>
         </div>
-    </div>
-    <div class="text-center">
-        <button class="btn btn-outline-secondary mx-2" [ngClass]="{ 'invisible': homeService.currentPageNumber === 1 }"
-            (click)="onClickChangePage(true)">Previous Page</button>
-        <button class="btn btn-outline-secondary mx-2"
-            [ngClass]="{ 'invisible': homeService.currentPageNumber === homeService.totalPageNumber}"
-            (click)="onClickChangePage(false)">Next Page</button>
     </div>
     }
     <table class="table table-hover">
@@ -129,16 +148,20 @@
         </tbody>
     </table>
     @if (homeService.totalPageNumber != 1) {
-    <div class="text-center">
-        <button class="btn btn-outline-secondary mx-2" [ngClass]="{ 'invisible': homeService.currentPageNumber === 1 }"
-            (click)="onClickChangePage(true)">Previous Page</button>
-        <button class="btn btn-outline-secondary mx-2"
-            [ngClass]="{ 'invisible': homeService.currentPageNumber === homeService.totalPageNumber}"
-            (click)="onClickChangePage(false)">Next Page</button>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-2">
+            </div>
+            <div class="col-md-10 text-end">
+                <button class="btn btn-outline-secondary mx-2"
+                    [ngClass]="{ 'invisible': homeService.currentPageNumber === 1 }"
+                    (click)="onClickChangePage(true)">Previous Page</button>
+                <button class="btn btn-outline-secondary mx-2"
+                    [ngClass]="{ 'invisible': homeService.currentPageNumber === homeService.totalPageNumber}"
+                    (click)="onClickChangePage(false)">Next Page</button>
+            </div>
+        </div>
     </div>
     }
     }
 </div>
-
-
-<ng-template #modalContainer></ng-template>

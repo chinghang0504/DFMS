@@ -4,10 +4,12 @@ import { HomeComponent } from './components/home/home.component';
 import { SettingsComponent } from './components/settings/settings.component';
 import { AboutComponent } from './components/about/about.component';
 import { PageNotFoundComponent } from './components/page-not-found/page-not-found.component';
+import { TagsComponent } from './components/tags/tags.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
   { path: 'home', component: HomeComponent },
+  { path: 'tags', component: TagsComponent },
   { path: 'settings', component: SettingsComponent },
   { path: 'about', component: AboutComponent },
   { path: 'page-not-found', component: PageNotFoundComponent },

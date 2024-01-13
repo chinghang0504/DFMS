@@ -1,0 +1,29 @@
+<h3 class="my-3">Tags</h3>
+
+<div class="mb-3">
+    @if (tagsService.isEmpty()) {
+    <p>There is no any tags.</p>
+    } @else {
+    @for (tag of tagsService.tags; track $index) {
+    <button class="btn btn-outline-secondary mx-1 rounded-pill" (click)="onClickTagButton(tag)">
+        {{ tag }}
+    </button>
+    }
+    }
+</div>
+
+<div class="mb-5">
+    <button class="btn btn-outline-primary mx-2" [disabled]="tagsService.isEmpty()" (click)="onClickClearButton()">
+        Clear All Tags
+    </button>
+</div>
+
+<div class="mb-3">
+    <h3 class="mb-3">Add a Tag</h3>
+    <div class="form-group mb-3">
+        <label for="tagName">Tag Name</label>
+        <input type="text" class="form-control" id="tagName" [(ngModel)]="tagName" (input)="helpMessage = ''">
+        <small class="form-text text-muted">{{ helpMessage }}</small>
+    </div>
+    <button class="btn btn-primary mx-2" (click)="onClickSaveButton()">Save</button>
+</div>
