@@ -3,6 +3,7 @@ import { DesktopFile } from '../models/desktop-file';
 import { SettingsService } from './settings.service';
 import { DesktopFilePackage } from '../models/desktop-file-package';
 import { SortingMode } from '../models/sorting-mode';
+import { SearchingTag } from '../models/searching-tag';
 
 interface WorkerData {
   folderList: DesktopFile[],
@@ -10,7 +11,8 @@ interface WorkerData {
   showHidden: boolean,
   enableSearching: boolean,
   searchingName: string,
-  sortingMode: SortingMode;
+  sortingMode: SortingMode,
+  searchingTags: SearchingTag[];
 }
 
 @Injectable({
@@ -20,20 +22,21 @@ export class HomeService {
 
   // UI data
   loading: boolean = true;
-  errorMessage: string = "";
-  currentFolderPath: string = "";
+  errorMessage: string = '';
+  currentFolderPath: string = '';
   allFiles: boolean = false;
   enableSearching: boolean = false;
-  searchingName: string = "";
+  searchingName: string = '';
   sortingMode: SortingMode = SortingMode.NAME_ASCENDING;
   desktopFiles1000: DesktopFile[] = [];
   currentPageNumber: number = 1;
   totalPageNumber: number = 1;
+  searchingTags: SearchingTag[] = [];
 
   // Internal data
-  private _folderList: DesktopFile[];
-  private _fileList: DesktopFile[];
-  private _desktopFiles: DesktopFile[];
+  private _folderList: DesktopFile[] = [];
+  private _fileList: DesktopFile[] = [];
+  private _desktopFiles: DesktopFile[] = [];
   private _worker: Worker;
 
   // Injection
@@ -41,16 +44,11 @@ export class HomeService {
 
   // Getters
   get size() {
-    return this._desktopFiles?.length;
+    return this._desktopFiles.length;
   }
 
-  // Clear data
-  clearData() {
-    this.desktopFiles1000 = [];
-
-    this._folderList = [];
-    this._fileList = [];
-    this._desktopFiles = [];
+  // Terminate worker
+  terminateWorker() {
     this._worker?.terminate();
   }
 
@@ -61,7 +59,7 @@ export class HomeService {
       this._fileList = desktopFilePackage.fileList;
     }
 
-    this._worker?.terminate();
+    this.terminateWorker();
 
     const workerData: WorkerData = {
       folderList: this._folderList,
@@ -69,7 +67,8 @@ export class HomeService {
       showHidden: this.settingsService.showHidden,
       enableSearching: this.enableSearching,
       searchingName: this.searchingName,
-      sortingMode: this.sortingMode
+      sortingMode: this.sortingMode,
+      searchingTags: this.searchingTags
     };
 
     // Worker
@@ -78,30 +77,24 @@ export class HomeService {
 
       this._worker.onmessage = ({ data }) => {
         this._desktopFiles = data;
-
-        this.totalPageNumber = Math.ceil(this._desktopFiles.length / 1000);
-        this.currentPageNumber = 1;
-        this.desktopFiles1000 = this._desktopFiles.slice(0, 1000);
+        this.extract1000DesktopFiles();
         this.loading = false;
       };
 
       this._worker.postMessage(workerData);
     }
-    // Non-workder
+    // Non-worker
     else {
       this._desktopFiles = HomeService.filterAndSortDesktopFiles(workerData);
-
-      this.totalPageNumber = Math.ceil(this._desktopFiles.length / 1000);
-      this.currentPageNumber = 1;
-      this.desktopFiles1000 = this._desktopFiles.slice(0, 1000);
+      this.extract1000DesktopFiles();
       this.loading = false;
     }
   }
 
   // Filter and sort desktop files
   static filterAndSortDesktopFiles(workderData: WorkerData): DesktopFile[] {
-    const tempFolderList: DesktopFile[] = HomeService.filterDesktopFiles(workderData.folderList, workderData.showHidden, workderData.enableSearching, workderData.searchingName);
-    const tempFileList: DesktopFile[] = HomeService.filterDesktopFiles(workderData.fileList, workderData.showHidden, workderData.enableSearching, workderData.searchingName);
+    const tempFolderList: DesktopFile[] = HomeService.filterDesktopFiles(workderData.folderList, workderData.showHidden, workderData.enableSearching, workderData.searchingName, workderData.searchingTags);
+    const tempFileList: DesktopFile[] = HomeService.filterDesktopFiles(workderData.fileList, workderData.showHidden, workderData.enableSearching, workderData.searchingName, workderData.searchingTags);
 
     HomeService.sortDesktopFiles(tempFolderList, workderData.sortingMode);
     HomeService.sortDesktopFiles(tempFileList, workderData.sortingMode);
@@ -110,7 +103,7 @@ export class HomeService {
   }
 
   // Filter the desktop files
-  static filterDesktopFiles(desktopFiles: DesktopFile[], showHidden: boolean, enableSearching: boolean, searchingInput: string): DesktopFile[] {
+  static filterDesktopFiles(desktopFiles: DesktopFile[], showHidden: boolean, enableSearching: boolean, searchingInput: string, searchingTags: SearchingTag[]): DesktopFile[] {
     return desktopFiles.filter(
       (desktopFile: DesktopFile) => {
         // Hidden file
@@ -118,9 +111,18 @@ export class HomeService {
           return false;
         }
 
-        // Searching name
-        if (enableSearching && searchingInput) {
-          return desktopFile.name.toLocaleLowerCase().indexOf(searchingInput.toLocaleLowerCase()) != -1;
+        if (enableSearching) {
+          // Name
+          if (searchingInput && desktopFile.name.toLocaleLowerCase().indexOf(searchingInput.toLocaleLowerCase()) === -1) {
+            return false;
+          }
+
+          // Tags
+          for (const searchingTag of searchingTags) {
+            if (searchingTag.active && desktopFile.tags.indexOf(searchingTag.name) === -1) {
+              return false;
+            }
+          }
         }
 
         return true;
@@ -132,29 +134,44 @@ export class HomeService {
   static sortDesktopFiles(desktopFiles: DesktopFile[], sortingMode: SortingMode) {
     const factor: number = sortingMode % 2 === 0 ? 1 : -1;
 
-    // Name
-    if (sortingMode === SortingMode.NAME_ASCENDING || sortingMode === SortingMode.NAME_DESCENDING) {
-      desktopFiles.sort((a, b) => {
-        return a.name.toLocaleLowerCase().localeCompare(b.name.toLocaleLowerCase()) * factor;
-      });
+    switch (sortingMode) {
+      case SortingMode.NAME_ASCENDING:
+      case SortingMode.NAME_DESCENDING:
+        desktopFiles.sort((a, b) => {
+          return a.name.toLocaleLowerCase().localeCompare(b.name.toLocaleLowerCase()) * factor;
+        });
+        break;
+      case SortingMode.LAST_MODIFIED_ASCENDING:
+      case SortingMode.LAST_MODIFIED_DESCENDING:
+        desktopFiles.sort((a, b) => {
+          return (a.lastModified - b.lastModified) * factor;
+        });
+        break;
+      case SortingMode.TYPE_ASCENDING:
+      case SortingMode.TYPE_DESCENDING:
+        desktopFiles.sort((a, b) => {
+          return a.extension.toLocaleLowerCase().localeCompare(b.extension.toLocaleLowerCase()) * factor;
+        });
+        break;
+      case SortingMode.SIZE_ASCENDING:
+      case SortingMode.SIZE_DESCENDING:
+        desktopFiles.sort((a, b) => {
+          return (a.size - b.size) * factor;
+        });
+        break;
     }
-    // Last modified
-    else if (sortingMode === SortingMode.LAST_MODIFIED_ASCENDING || sortingMode === SortingMode.LAST_MODIFIED_DESCENDING) {
-      desktopFiles.sort((a, b) => {
-        return (a.lastModified - b.lastModified) * factor;
-      });
-    }
-    // Type
-    else if (sortingMode === SortingMode.TYPE_ASCENDING || sortingMode === SortingMode.TYPE_DESCENDING) {
-      desktopFiles.sort((a, b) => {
-        return a.extension.toLocaleLowerCase().localeCompare(b.extension.toLocaleLowerCase()) * factor;
-      });
-    }
-    // Size
-    else if (sortingMode === SortingMode.SIZE_ASCENDING || sortingMode === SortingMode.SIZE_DESCENDING) {
-      desktopFiles.sort((a, b) => {
-        return (a.size - b.size) * factor;
-      });
+  }
+
+  // Extract 1000 desktop files
+  extract1000DesktopFiles() {
+    if (this._desktopFiles.length > 0) {
+      this.totalPageNumber = Math.ceil(this._desktopFiles.length / 1000);
+      this.currentPageNumber = 1;
+      this.desktopFiles1000 = this._desktopFiles.slice(0, 1000);
+    } else {
+      this.totalPageNumber = 0;
+      this.currentPageNumber = 0;
+      this.desktopFiles1000 = [];
     }
   }
 

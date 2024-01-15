@@ -7,9 +7,11 @@ import { DesktopFile } from '../models/desktop-file';
 export class ByteSizePipe implements PipeTransform {
 
   transform(desktopFile: DesktopFile): string {
-    if (desktopFile.isFolder)
+    if (desktopFile.isFolder) {
       return '';
-    else
+    }
+    else {
       return Math.ceil(desktopFile.size / 1024) + ' KB';
+    }
   }
 }

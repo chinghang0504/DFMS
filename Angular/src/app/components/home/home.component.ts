@@ -7,8 +7,8 @@ import { DesktopFilePackage } from '../../models/desktop-file-package';
 import { ErrorPackage } from '../../models/error-package';
 import { SettingsService } from '../../services/settings.service';
 import { DesktopCommunicationService } from '../../services/desktop-communication.service';
-import { TagsService } from '../../services/tags.service';
 import { ModalService } from '../../services/modal.service';
+import { SearchingTag } from '../../models/searching-tag';
 
 @Component({
   selector: 'app-home',
@@ -19,7 +19,7 @@ export class HomeComponent implements OnInit {
 
   // Injection
   constructor(
-    public homeService: HomeService, public tagsService: TagsService,
+    public homeService: HomeService,
     private settingsService: SettingsService, private desktopCommunicationService: DesktopCommunicationService, private modalService: ModalService,
     private activatedRoute: ActivatedRoute, private router: Router) { }
 
@@ -37,7 +37,7 @@ export class HomeComponent implements OnInit {
           this.homeService.allFiles = false;
           this.getDesktopFilePackage();
         } else {
-          this.homeService.currentFolderPath ? this.navigateCurrentFolderPath() : this.navigateDefaultFolderPath();
+          this.homeService.currentFolderPath ? this.navigateCurrentFolder() : this.navigateHomeFolder();
         }
       });
   }
@@ -51,37 +51,33 @@ export class HomeComponent implements OnInit {
     });
   }
 
-  // Navigate the current folder path
-  private navigateCurrentFolderPath() {
+  // Navigate the current folder
+  private navigateCurrentFolder() {
     this.navigate(this.homeService.currentFolderPath);
   }
 
-  // Navigate the default foler path
-  private navigateDefaultFolderPath() {
+  // Navigate the home folder
+  private navigateHomeFolder() {
     this.navigate(this.settingsService.homeFolderPath);
   }
 
   // Get a desktop file package
   private getDesktopFilePackage() {
-    this.homeService.loading = true;
-    this.homeService.errorMessage = "";
-    this.homeService.clearData();
-
-    // Unsubscribe the previous get request
     this._subscription?.unsubscribe();
+
+    this.homeService.loading = true;
+    this.homeService.errorMessage = '';
+    this.homeService.terminateWorker();
 
     this._subscription = this.desktopCommunicationService.getDesktopFilePackage(this.homeService.currentFolderPath, this.homeService.allFiles)
       .subscribe(
         (res: DesktopFilePackage) => {
-          console.log('Receiving a desktop file package...');
-          console.log(res);
-
           this.homeService.updateDesktopFiles(res);
         }, (err) => {
           if (err['status'] === 400) {
             this.homeService.errorMessage = (<ErrorPackage>err['error']).message;
           } else {
-            this.homeService.errorMessage = "Unable to connect to the desktop.";
+            this.homeService.errorMessage = 'Unable to connect to the desktop.';
           }
 
           this.homeService.loading = false;
@@ -91,7 +87,7 @@ export class HomeComponent implements OnInit {
 
   // On change the current folder path
   onChangeCurrentFolderPath() {
-    this.navigateCurrentFolderPath();
+    this.navigateCurrentFolder();
   }
 
   // On click the parent button
@@ -104,7 +100,7 @@ export class HomeComponent implements OnInit {
       const lastChar: string = this.homeService.currentFolderPath.slice(-1);
 
       // The last character is a split
-      if (lastChar === "\\" || lastChar === "/") {
+      if (lastChar === '\\' || lastChar === '/') {
         this.homeService.allFiles = false;
         this.getDesktopFilePackage();
       }
@@ -123,7 +119,7 @@ export class HomeComponent implements OnInit {
       let tempCurrentFolderPath: string = this.homeService.currentFolderPath;
 
       // The last character is a split 
-      if (lastChar === "\\" || lastChar === "/") {
+      if (lastChar === '\\' || lastChar === '/') {
         tempCurrentFolderPath = tempCurrentFolderPath.substring(0, tempCurrentFolderPath.length - 1);
         numOfSplits--;
       }
@@ -133,13 +129,13 @@ export class HomeComponent implements OnInit {
     }
   }
 
-  // On click the default button
-  onClickDefaultButton() {
+  // On click the home button
+  onClickHomeButton() {
     if (this.homeService.currentFolderPath === this.settingsService.homeFolderPath) {
       this.homeService.allFiles = false;
       this.getDesktopFilePackage();
     } else {
-      this.navigateDefaultFolderPath();
+      this.navigateHomeFolder();
     }
   }
 
@@ -175,24 +171,17 @@ export class HomeComponent implements OnInit {
   onClickTableElementName(desktopFile: DesktopFile) {
     if (desktopFile.isFolder) {
       this.navigate(desktopFile.absolutePath);
-    } else {
-      this.openFile(desktopFile.absolutePath);
     }
   }
 
   // On click the open file button
   onClickOpenFileButton(desktopFilePath: string) {
-    this.openFile(desktopFilePath);
-  }
-
-  // Open the file
-  private openFile(desktopFilePath: string) {
     this.desktopCommunicationService.openDesktopFile(desktopFilePath)
       .subscribe(
         (res) => { },
         (err) => {
           this.modalService.executeOneButtonModal(
-            "System Error", (<ErrorPackage>err['error']).message, "OK"
+            'System Error', (<ErrorPackage>err['error']).message, 'OK'
           );
         }
       );
@@ -201,26 +190,21 @@ export class HomeComponent implements OnInit {
   // On click delete file button
   onClickDeleteFileButton(desktopFile: DesktopFile) {
     this.modalService.executeTwoButtonModal(
-      "Delete Confirmation", `Are you sure want to delete ${desktopFile.name}`, "Delete this file", "Cancel",
+      'Delete Confirmation', `Are you sure want to delete ${desktopFile.name}`, 'Delete', 'Cancel',
       () => {
-        this.deleteFile(desktopFile.absolutePath);
+        this.desktopCommunicationService.deleteDesktopFile(desktopFile.absolutePath)
+          .subscribe(
+            (res) => {
+              this.getDesktopFilePackage();
+            },
+            (err) => {
+              this.modalService.executeOneButtonModal(
+                'System Error', (<ErrorPackage>err['error']).message, "OK"
+              );
+            }
+          );
       }
     );
-  }
-
-  // Delete the file
-  private deleteFile(desktopFilePath: string) {
-    this.desktopCommunicationService.deleteDesktopFile(desktopFilePath)
-      .subscribe(
-        (res) => {
-          this.getDesktopFilePackage();
-        },
-        (err) => {
-          this.modalService.executeOneButtonModal(
-            "System Error", (<ErrorPackage>err['error']).message, "OK"
-          );
-        }
-      );
   }
 
   // On click change the page
@@ -237,9 +221,18 @@ export class HomeComponent implements OnInit {
     this.homeService.updatePage(this.homeService.currentPageNumber);
   }
 
-  // // On click the tag button
-  // onClickTagButton(elementRef: ElementRef ,tag: string) {
-  //   // (elementRef.nativeElement as HTMLElement)
-  //   console.log(tag);
-  // }
+  // On click the searching tag button
+  onClickSearchingTagButton(searchingTag: SearchingTag) {
+    searchingTag.active = !searchingTag.active;
+    this.homeService.updateDesktopFiles();
+  }
+
+  // On click the tag button
+  onClickTagButton(desktopFile: DesktopFile) {
+    this.router.navigate(['/home', 'file-details'], {
+      queryParams: {
+        'path': desktopFile.absolutePath
+      }
+    });
+  }
 }

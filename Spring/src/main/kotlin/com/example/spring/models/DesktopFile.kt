@@ -11,5 +11,7 @@ data class DesktopFile(
     val parentFolderPath: String,
 
     val isFolder: Boolean,
-    val isHidden: Boolean
+    val isHidden: Boolean,
+
+    val tags: List<String>?
 )

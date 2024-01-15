@@ -33,5 +33,12 @@ class ResponseEntityManager {
                 .header("Access-Control-Allow-Origin", "*")
                 .body(DesktopFilePackage(folderList, fileList))
         }
+
+        fun get(desktopFile: DesktopFile): ResponseEntity<DesktopFile> {
+            return ResponseEntity
+                .accepted()
+                .header("Access-Control-Allow-Origin", "*")
+                .body(desktopFile)
+        }
     }
 }

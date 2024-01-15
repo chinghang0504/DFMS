@@ -1,0 +1,83 @@
+<div class="my-3">
+    <i class="bi bi-arrow-left-square h3 mx-2" (click)="onClickBackLink()"></i>
+    <h3 class="d-inline">File</h3>
+    <i class="bi bi-arrow-clockwise h3 float-end" (click)="onClickUpdateButton()"></i>
+</div>
+
+@if (loading) {
+<div class="mb-3">
+    <p>loading ...</p>
+</div>
+
+} @else if (errorMessage) {
+<div class="alert alert-danger d-flex align-items-center fade show mb-3">
+    <i class="bi-exclamation-octagon-fill"></i>
+    <strong class="mx-2">Error!</strong>{{ errorMessage }}
+</div>
+} @else {
+<table class="table table-bordered table-striped mb-3">
+    <thead>
+        <tr>
+            <th>Attribute</th>
+            <th>Value</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Name</td>
+            <td>{{ desktopFile.name }}</td>
+        </tr>
+        <tr>
+            <td>Last Modified</td>
+            <td>{{ desktopFile.lastModified | lastModifiedDate }}</td>
+        </tr>
+        <tr>
+            <td>Type</td>
+            <td>{{ desktopFile.extension }}</td>
+        </tr>
+        <tr>
+            <td>Size</td>
+            <td>{{ desktopFile | byteSize }}</td>
+        </tr>
+        <tr>
+            <td>Location</td>
+            <td>{{ desktopFile.absolutePath }}</td>
+        </tr>
+        <tr>
+            <td>Hidden</td>
+            <td>{{ desktopFile.isHidden ? 'Yes' : 'No' }}</td>
+        </tr>
+    </tbody>
+</table>
+
+<div class="mb-3">
+    <h3 class="mb-3">File Tags</h3>
+    @if (desktopFile.tags.length === 0) {
+    <p>There is no any tags in this file.</p>
+    }
+    @else {
+    @for (tag of desktopFile.tags; track $index) {
+    <button class="btn btn-outline-secondary mx-1 rounded-pill" (click)="onClickRemoveTag(tag)">
+        {{ tag }}
+    </button>
+    }
+    }
+</div>
+<div class="form-group mb-3">
+    <button type="reset" class="btn btn-outline-primary mx-2" (click)="onClickClearButton()">Clear all tags</button>
+    <button type="submit" class="btn btn-primary mx-2" (click)="onClickSaveButton()">Save</button>
+</div>
+
+<div class="mb-3">
+    <h6 class="mb-3">Do you want to add any system tags to this file?</h6>
+    @if (systemTagsService.isEmpty()) {
+    <p>There is no any tags in this system.</p>
+    } @else {
+    @for (tag of systemTagsService.tags; track $index) {
+    <button class="btn btn-outline-secondary mx-1 rounded-pill" (click)="onClickAddTag(tag)">
+        {{ tag }}
+    </button>
+    }
+    }
+</div>
+}

@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { DesktopFile } from '../models/desktop-file';
 
 @Injectable({
   providedIn: 'root'
@@ -12,6 +13,8 @@ export class DesktopCommunicationService {
   private readonly GET_DESKTOP_FILE_PACKAGE_URL: string = '/getDesktopFilePackage';
   private readonly OPEN_DESKTOP_FILE_URL: string = '/openDesktopFile';
   private readonly DELETE_DESKTOP_FILE_URL: string = '/deleteDesktopFile';
+  private readonly GET_DESKTOP_FILE_URL: string = '/getDesktopFile';
+  private readonly CHANGE_DESKTOP_FILE_URL: String = "/changeDesktopFile";
 
   // Injection
   constructor(private httpClient: HttpClient) { }
@@ -48,6 +51,31 @@ export class DesktopCommunicationService {
       {
         params: {
           'path': desktopFilePath
+        }
+      }
+    );
+  }
+
+  // Get a desktop file
+  getDesktopFile(desktopFilePath: string): Observable<DesktopFile> {
+    return this.httpClient.get<DesktopFile>(
+      this.SERVER_URL + this.GET_DESKTOP_FILE_URL,
+      {
+        params: {
+          'path': desktopFilePath
+        }
+      }
+    );
+  }
+
+  // Change a desktop file
+  changeDesktopFile(desktopFilePath: string, tags: string[]): Observable<Object> {
+    return this.httpClient.get<DesktopFile>(
+      this.SERVER_URL + this.CHANGE_DESKTOP_FILE_URL,
+      {
+        params: {
+          'path': desktopFilePath,
+          'tags': tags
         }
       }
     );

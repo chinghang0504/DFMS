@@ -10,4 +10,6 @@ export interface DesktopFile {
 
     isFolder: boolean;
     isHidden: boolean;
+
+    tags: string[];
 }

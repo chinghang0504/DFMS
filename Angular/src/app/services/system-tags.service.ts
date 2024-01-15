@@ -1,15 +1,20 @@
 import { Injectable } from '@angular/core';
+import { HomeService } from './home.service';
+import { SearchingTag } from '../models/searching-tag';
 
 @Injectable({
   providedIn: 'root'
 })
-export class TagsService {
+export class SystemTagsService {
 
   // Keys
   private readonly TAGS_KEY: string = 'TAGS';
 
   // Internal data
   private _tags: string[] = [];
+
+  // Injection
+  constructor(private homeService: HomeService) { }
 
   // Getters
   get tags() {
@@ -24,7 +29,17 @@ export class TagsService {
   // Load tags from the local storage
   loadTags() {
     const tags: string = window.localStorage.getItem(this.TAGS_KEY);
-    this._tags = tags ? this.sortTags(JSON.parse(tags)) : [];
+    if (tags) {
+      this._tags = this.sortTags(JSON.parse(tags));
+
+      this.homeService.searchingTags = this._tags.map((tag) => {
+        return { name: tag, active: false };
+      });
+    } else {
+      this._tags = [];
+
+      this.homeService.searchingTags = [];
+    }
   }
 
   // Sort the tags
@@ -39,6 +54,8 @@ export class TagsService {
   clearTags() {
     this._tags = [];
     this.saveTags();
+
+    this.homeService.searchingTags = [];
   }
 
   // Save tags into the local storage
@@ -54,6 +71,10 @@ export class TagsService {
       this._tags = this.sortTags(tags);
       this.saveTags();
 
+      const searchingTags: SearchingTag[] = [...this.homeService.searchingTags];
+      searchingTags.push({ name: tag, active: false });
+      this.homeService.searchingTags = this.sortSearchingTags(searchingTags);
+
       return true;
     }
 
@@ -65,12 +86,27 @@ export class TagsService {
     return this._tags.indexOf(tag) === -1;
   }
 
+  // Sort the searching tags
+  private sortSearchingTags(searchingTags: SearchingTag[]): SearchingTag[] {
+    searchingTags.sort((a, b) => {
+      return a.name.toLocaleLowerCase().localeCompare(b.name.toLocaleLowerCase());
+    });
+    return searchingTags;
+  }
+
   // Remove a tag
   removeTag(tag: string) {
     const index: number = this._tags.indexOf(tag);
-    if (index != -1) {
+    if (index !== -1) {
       this._tags.splice(index, 1);
       this.saveTags();
+    }
+
+    const searchingIndex: number = this.homeService.searchingTags.findIndex((searchingTag) => {
+      return searchingTag.name === tag;
+    });
+    if (index !== -1) {
+      this.homeService.searchingTags.splice(searchingIndex, 1);
     }
   }
 }

@@ -1,4 +1,4 @@
-export interface Tag {
+export interface SearchingTag {
 
     name: string;
     active: boolean;

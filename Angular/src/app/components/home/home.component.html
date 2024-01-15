@@ -1,59 +1,62 @@
 <h3 class="my-3">Home</h3>
 
-<div class="form-group mb-2">
-    <label for="">Current Folder: </label>
-    <div class="input-group">
-        <input type="text" class="form-control" [(ngModel)]="homeService.currentFolderPath"
+<div class="form-group mb-3">
+    <label for="currentFolderPath">Current Folder</label>
+    <div class="input-group mb-2">
+        <input type="text" class="form-control" id="currentFolderPath" [(ngModel)]="homeService.currentFolderPath"
             (change)="onChangeCurrentFolderPath()">
         <button class="btn btn-outline-secondary" type="button" (click)="onClickParentButton()" title="Parent Folder">
             <i class="bi bi-arrow-90deg-left"></i>
         </button>
-        <button class="btn btn-outline-secondary" type="button" (click)="onClickDefaultButton()" title="Default Folder">
+        <button class="btn btn-outline-secondary" type="button" (click)="onClickHomeButton()" title="Home Folder">
             <i class="bi bi-house"></i>
         </button>
         <button class="btn btn-outline-secondary" type="button" (click)="onClickRefreshButton()" title="Refresh">
             <i class="bi bi-arrow-clockwise"></i>
         </button>
     </div>
-</div>
 
-<div class="mb-3">
     <div class="btn-group" role="group">
         <button class="btn btn-success" (click)="onClickFileOptionButton(false)" [disabled]="!homeService.allFiles"
             title="Show folders and files within the current folder">
             This Folder
         </button>
         <button class="btn btn-success" (click)="onClickFileOptionButton(true)" [disabled]="homeService.allFiles"
-            title="Show all files under the current folder">
+            title="Show all files inside the current folder">
             All Files
         </button>
     </div>
 </div>
 
-<div class="mb-4">
-    <button class="btn btn-outline-primary" (click)="onClickSearchingButton()">
+<div class="mb-3">
+    <button class="btn btn-outline-primary mb-2" (click)="onClickSearchingButton()">
         {{ homeService.enableSearching ? 'Disable Searching' : 'Enable Searching' }}
     </button>
-    <span class="mx-3" [hidden]="homeService.loading || homeService.errorMessage">{{ homeService.size }} results found</span>
+    <span class="mx-3" [hidden]="homeService.loading || homeService.errorMessage">
+        {{ homeService.size }} folders and files
+    </span>
     @if (homeService.enableSearching) {
     <div class="mb-2">
         <label for="searchingName">Search by name</label>
         <input type="text" class="form-control" id="searchingName" [(ngModel)]="homeService.searchingName"
             (input)="onInputSearchingName()">
     </div>
-    <!-- <div>
-        <label>Search by tags</label>
-        @if (tagsService.tags.length === 0) {
-        <p class="mx-3">There is no any tags.</p>
+    <div class="mb-2">
+        <label for="searchingTagsCheckBox">Search by tags</label>
+        @if (homeService.searchingTags.length === 0) {
+        <p class="mx-3">There is no any tags in this system.</p>
         } @else {
         <div>
-            @for (tag of tagsService.tags; track $index) {
-            <button class="btn btn-outline-secondary mx-1 rounded-pill" (click)="onClickTagButton(tagButton, tag)"
-                #tagButton>{{ tag }}</button>
+            @for (searchingTag of homeService.searchingTags; track $index) {
+            <button class="btn mx-1 rounded-pill"
+                [ngClass]="{ 'btn-outline-secondary': !searchingTag.active, 'btn-secondary': searchingTag.active }"
+                (click)="onClickSearchingTagButton(searchingTag)">
+                {{ searchingTag.name }}
+            </button>
             }
         </div>
         }
-    </div> -->
+    </div>
     }
 </div>
 
@@ -66,15 +69,15 @@
         <strong class="mx-2">Error!</strong>{{ homeService.errorMessage }}
     </div>
     } @else {
-    @if (homeService.totalPageNumber != 1) {
+    @if (homeService.totalPageNumber > 1) {
     <div class="container">
         <div class="row">
             <div class="col-md-2">
                 <div class="input-group">
-                    <span class="input-group-text" id="basic-addon1">Page</span>
-                    <input type="text" style="text-align: right;" class="form-control" id="pageNumber" [(ngModel)]="homeService.currentPageNumber"
-                        (change)="onInputChangePage()">
-                        <span class="input-group-text" id="basic-addon1">/ {{ homeService.totalPageNumber }}</span>
+                    <span class="input-group-text">Page</span>
+                    <input type="text" style="text-align: right;" class="form-control"
+                        [(ngModel)]="homeService.currentPageNumber" (change)="onInputChangePage()">
+                    <span class="input-group-text">/ {{ homeService.totalPageNumber }}</span>
                 </div>
             </div>
             <div class="col-md-10 text-end">
@@ -93,23 +96,23 @@
             <tr>
                 <th style="width: 54%;" (click)="onClickTableHeader(0)">
                     Name ({{ homeService.desktopFiles1000.length }})
-                    <i class="bi bi-caret-down-fill" [hidden]="homeService.sortingMode !== 0"></i>
-                    <i class="bi bi-caret-up-fill" [hidden]="homeService.sortingMode !== 1"></i>
+                    <i class="bi bi-caret-up-fill" [hidden]="homeService.sortingMode !== 0"></i>
+                    <i class="bi bi-caret-down-fill" [hidden]="homeService.sortingMode !== 1"></i>
                 </th>
                 <th class="text-center" style="width: 15%;" (click)="onClickTableHeader(2)">
                     Last modified
-                    <i class="bi bi-caret-down-fill" [hidden]="homeService.sortingMode !== 2"></i>
-                    <i class="bi bi-caret-up-fill" [hidden]="homeService.sortingMode !== 3"></i>
+                    <i class="bi bi-caret-up-fill" [hidden]="homeService.sortingMode !== 2"></i>
+                    <i class="bi bi-caret-down-fill" [hidden]="homeService.sortingMode !== 3"></i>
                 </th>
                 <th class="text-center" style="width: 8%;" (click)="onClickTableHeader(4)">
                     Type
-                    <i class="bi bi-caret-down-fill" [hidden]="homeService.sortingMode !== 4"></i>
-                    <i class="bi bi-caret-up-fill" [hidden]="homeService.sortingMode !== 5"></i>
+                    <i class="bi bi-caret-up-fill" [hidden]="homeService.sortingMode !== 4"></i>
+                    <i class="bi bi-caret-down-fill" [hidden]="homeService.sortingMode !== 5"></i>
                 </th>
                 <th class="text-center" style="width: 10%;" (click)="onClickTableHeader(6)">
                     Size
-                    <i class="bi bi-caret-down-fill" [hidden]="homeService.sortingMode !== 6"></i>
-                    <i class="bi bi-caret-up-fill" [hidden]="homeService.sortingMode !== 7"></i>
+                    <i class="bi bi-caret-up-fill" [hidden]="homeService.sortingMode !== 6"></i>
+                    <i class="bi bi-caret-down-fill" [hidden]="homeService.sortingMode !== 7"></i>
                 </th>
                 <th class="text-center" style="width: 13%;">
                     Actions
@@ -118,12 +121,12 @@
         </thead>
         <tbody>
             @for (desktopFile of homeService.desktopFiles1000; track $index) {
-            <tr [ngClass]="{ 'table-light': desktopFile.isFolder}">
-                <td title="{{ desktopFile.absolutePath }}" (click)="onClickTableElementName(desktopFile)">
+            <tr [ngClass]="{ 'table-light': desktopFile.isFolder }">
+                <td title="{{ desktopFile.tags | tags }}" (click)="onClickTableElementName(desktopFile)">
                     {{ desktopFile.name }}
                 </td>
                 <td class="text-center">
-                    {{ desktopFile.lastModified | date:'yyyy/MM/dd/ hh:mm' }}
+                    {{ desktopFile.lastModified | lastModifiedDate }}
                 </td>
                 <td class="text-center">
                     {{ desktopFile.extension }}
@@ -141,16 +144,23 @@
                     <i class="bi bi-folder mx-2" title="Show in folder"
                         (click)="onClickOpenFileButton(desktopFile.parentFolderPath)"></i>
                     <i class="bi bi-trash mx-2" title="Delete file" (click)="onClickDeleteFileButton(desktopFile)"></i>
+                    <i class="bi bi-bookmark mx-2" title="File Details" (click)="onClickTagButton(desktopFile)"></i>
                     }
                 </td>
             </tr>
             }
         </tbody>
     </table>
-    @if (homeService.totalPageNumber != 1) {
+    @if (homeService.totalPageNumber > 1) {
     <div class="container">
         <div class="row">
             <div class="col-md-2">
+                <div class="input-group">
+                    <span class="input-group-text">Page</span>
+                    <input type="text" style="text-align: right;" class="form-control"
+                        [(ngModel)]="homeService.currentPageNumber" (change)="onInputChangePage()">
+                    <span class="input-group-text">/ {{ homeService.totalPageNumber }}</span>
+                </div>
             </div>
             <div class="col-md-10 text-end">
                 <button class="btn btn-outline-secondary mx-2"
