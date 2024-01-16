@@ -77,7 +77,7 @@ export class HomeComponent implements OnInit {
           if (err['status'] === 400) {
             this.homeService.errorMessage = (<ErrorPackage>err['error']).message;
           } else {
-            this.homeService.errorMessage = 'Unable to connect to the desktop.';
+            this.homeService.errorMessage = 'Unable to connect to the desktop. Please make sure that the DFMS.exe is open.';
           }
 
           this.homeService.loading = false;

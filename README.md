@@ -1,1 +1,5 @@
 # DFMS
+
+## What is DFMS?
+
+DFMS, the Desktop File Management System, is an innovative software product designed to enhance the efficiency of file organization and access on Windows operating systems. Through a user-friendly browser interface, DFMS allows users to seamlessly navigate and explore folders and files with ease. With a simple click, users can effortlessly view the contents of entire folders, streamlining the file browsing experience. The standout feature of DFMS is its robust file search functionality, enabling users to locate specific files swiftly by their names. A key aspect of the software is its powerful tagging system, which empowers users to add relevant tags to files. This tagging system proves invaluable for efficient file retrieval, eliminating the need for manual copying and storage duplication. For instance, when dealing with files containing various features, users can tag them accordingly, avoiding the cumbersome process of copying each file to individual feature folders. DFMS revolutionizes desktop file management, providing a smart and efficient solution to optimize storage utilization and simplify file organization.
