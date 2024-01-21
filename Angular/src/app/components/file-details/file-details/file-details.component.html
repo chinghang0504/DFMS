@@ -1,0 +1,23 @@
+<div class="my-3">
+    <i class="bi bi-arrow-left-square h3 mx-3" (click)="onClickBackButton()"></i>
+    <h3 class="d-inline">File Details</h3>
+    <i class="bi bi-arrow-clockwise h3 float-end"
+        [ngClass]="{ 'invisible': !desktopFile }"
+        (click)="onClickUpdateButton()">
+    </i>
+</div>
+
+@if (loading) {
+<div class="mb-3">
+    <p>loading ...</p>
+</div>
+} @else if (errorMessage) {
+<div class="alert alert-danger d-flex align-items-center fade show mb-3">
+    <i class="bi-exclamation-octagon-fill"></i>
+    <strong class="mx-2">Error!</strong>{{ errorMessage }}
+</div>
+} @else {
+<app-file-details-table [desktopFile]="desktopFile"></app-file-details-table>
+
+<app-file-details-file-tags [parent]="this" [desktopFile]="desktopFile"></app-file-details-file-tags>
+}

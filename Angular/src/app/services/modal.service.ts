@@ -1,7 +1,7 @@
 import { Injectable, ViewContainerRef } from '@angular/core';
 import { finalize, take } from 'rxjs';
-import { TwoButtonModalComponent } from '../components/two-button-modal/two-button-modal.component';
-import { OneButtonModalComponent } from '../components/one-button-modal/one-button-modal.component';
+import { TwoButtonModalComponent } from '../components/ui/modal/two-button-modal/two-button-modal.component';
+import { OneButtonModalComponent } from '../components/ui/modal/one-button-modal/one-button-modal.component';
 
 @Injectable({
   providedIn: 'root'
@@ -16,14 +16,14 @@ export class ModalService {
     this._modalViewContainerRef = modalViewContainerRef;
   }
 
-  // Execute the two button modal
-  executeTwoButtonModal(
+  // Execute the one button modal
+  executeOneButtonModal(
     modalTitle: string, modalBody: string,
-    trueButtonText: string, falseButtonText: string,
+    trueButtonText: string,
     trueButtonCallback?: () => void, falseButtonCallback?: () => void) {
-    const modalComponent: TwoButtonModalComponent = this._modalViewContainerRef.createComponent(TwoButtonModalComponent).instance;
+    const modalComponent: OneButtonModalComponent = this._modalViewContainerRef.createComponent(OneButtonModalComponent).instance;
 
-    modalComponent.setModal(modalTitle, modalBody, trueButtonText, falseButtonText)
+    modalComponent.setModal(modalTitle, modalBody, trueButtonText)
       .pipe(
         take(1),
         finalize(() => {
@@ -37,14 +37,14 @@ export class ModalService {
     modalComponent.showModal();
   }
 
-  // Execute the one button modal
-  executeOneButtonModal(
+  // Execute the two button modal
+  executeTwoButtonModal(
     modalTitle: string, modalBody: string,
-    trueButtonText: string,
+    trueButtonText: string, falseButtonText: string,
     trueButtonCallback?: () => void, falseButtonCallback?: () => void) {
-    const modalComponent: OneButtonModalComponent = this._modalViewContainerRef.createComponent(OneButtonModalComponent).instance;
+    const modalComponent: TwoButtonModalComponent = this._modalViewContainerRef.createComponent(TwoButtonModalComponent).instance;
 
-    modalComponent.setModal(modalTitle, modalBody, trueButtonText)
+    modalComponent.setModal(modalTitle, modalBody, trueButtonText, falseButtonText)
       .pipe(
         take(1),
         finalize(() => {

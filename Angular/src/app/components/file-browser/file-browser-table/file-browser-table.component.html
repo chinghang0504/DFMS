@@ -1,0 +1,75 @@
+<div class="mb-3">
+    @if (fileBrowserService.loading) {
+    <p>Loading...</p>
+    } @else if (fileBrowserService.errorMessage) {
+    <div class="alert alert-danger d-flex align-items-center fade show">
+        <i class="bi-exclamation-octagon-fill"></i>
+        <strong class="mx-2">Error!</strong>{{ fileBrowserService.errorMessage }}
+    </div>
+    } @else {
+    <app-file-browser-table-page></app-file-browser-table-page>
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th style="width: 54%;" (click)="onClickTableHeader(0)">
+                    Name ({{ fileBrowserService.desktopFiles1000.length }})
+                    <i class="bi bi-caret-up-fill" [hidden]="fileBrowserService.sortingMode !== 0"></i>
+                    <i class="bi bi-caret-down-fill" [hidden]="fileBrowserService.sortingMode !== 1"></i>
+                </th>
+                <th class="text-center" style="width: 15%;" (click)="onClickTableHeader(2)">
+                    Last modified
+                    <i class="bi bi-caret-up-fill" [hidden]="fileBrowserService.sortingMode !== 2"></i>
+                    <i class="bi bi-caret-down-fill" [hidden]="fileBrowserService.sortingMode !== 3"></i>
+                </th>
+                <th class="text-center" style="width: 8%;" (click)="onClickTableHeader(4)">
+                    Type
+                    <i class="bi bi-caret-up-fill" [hidden]="fileBrowserService.sortingMode !== 4"></i>
+                    <i class="bi bi-caret-down-fill" [hidden]="fileBrowserService.sortingMode !== 5"></i>
+                </th>
+                <th class="text-center" style="width: 10%;" (click)="onClickTableHeader(6)">
+                    Size
+                    <i class="bi bi-caret-up-fill" [hidden]="fileBrowserService.sortingMode !== 6"></i>
+                    <i class="bi bi-caret-down-fill" [hidden]="fileBrowserService.sortingMode !== 7"></i>
+                </th>
+                <th class="text-center" style="width: 13%;">
+                    Actions
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (desktopFile of fileBrowserService.desktopFiles1000; track $index) {
+            <tr [ngClass]="{ 'table-light': desktopFile.isFolder }">
+                <td title="{{ desktopFile.tags | tags }}" (click)="onClickElementName(desktopFile)">
+                    {{ desktopFile.name }}
+                </td>
+                <td class="text-center">
+                    {{ desktopFile.lastModified | lastModified }}
+                </td>
+                <td class="text-center">
+                    {{ desktopFile.type }}
+                </td>
+                <td class="text-end">
+                    {{ desktopFile | size }}
+                </td>
+                <td class="text-center">
+                    <i class="bi bi-file-earmark mx-2" title="Open file"
+                        [ngClass]="{ 'invisible': desktopFile.isFolder }"
+                        (click)="onClickOpenFileButton(desktopFile.absolutePath)">
+                    </i>
+                    <i class="bi bi-folder mx-2" [title]="desktopFile.isFolder ? 'Open folder' : 'Show in folder'"
+                        (click)="onClickOpenFileButton(desktopFile.isFolder ? desktopFile.absolutePath : desktopFile.parentPath)">
+                    </i>
+                    <i class="bi bi-trash mx-2" title="Delete file"
+                        (click)="onClickDeleteFileButton(desktopFile)">
+                    </i>
+                    <i class="bi bi-bookmark mx-2" title="File Details"
+                        (click)="onClickFileDetailsButton(desktopFile.absolutePath)">
+                    </i>
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table>
+    <app-file-browser-table-page></app-file-browser-table-page>
+    }
+</div>

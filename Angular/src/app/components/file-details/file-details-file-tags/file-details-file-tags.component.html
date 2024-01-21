@@ -1,0 +1,34 @@
+<div class="mb-3">
+    <h3 class="mb-3">File Tags</h3>
+    
+    @if (desktopFile.tags.length === 0) {
+    <p>There are no any tags in this file.</p>
+    }
+    @else {
+    @for (tag of desktopFile.tags; track $index) {
+    <button class="btn btn-outline-secondary mx-1 rounded-pill"
+        (click)="onClickRemoveFileTag(tag)">
+        {{ tag }}
+    </button>
+    }
+    }
+</div>
+
+<div class="form-group mb-5">
+    <button type="reset" class="btn btn-outline-primary mx-2" (click)="onClickClearButton()">Clear all tags</button>
+    <button type="submit" class="btn btn-primary mx-2" (click)="onClickSaveButton()">Save</button>
+</div>
+
+<div class="mb-3">
+    <h6 class="mb-3">Do you want to add any tags to this file?</h6>
+
+    @if (fileTagsService.isEmpty()) {
+    <p>There are no any tags.</p>
+    } @else {
+    @for (fileTag of fileTagsService.fileTags; track $index) {
+    <button class="btn btn-outline-secondary mx-1 rounded-pill" (click)="onClickAddFileTag(fileTag.name)">
+        {{ fileTag.name }}
+    </button>
+    }
+    }
+</div>

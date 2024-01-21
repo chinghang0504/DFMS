@@ -27,13 +27,14 @@ class ResponseEntityManager {
         }
 
         // Get the desktop file package
-        fun get(folderList: List<DesktopFile>, fileList: List<DesktopFile>): ResponseEntity<DesktopFilePackage> {
+        fun get(fileList: List<DesktopFile>, folderList: List<DesktopFile>): ResponseEntity<DesktopFilePackage> {
             return ResponseEntity
                 .accepted()
                 .header("Access-Control-Allow-Origin", "*")
-                .body(DesktopFilePackage(folderList, fileList))
+                .body(DesktopFilePackage(fileList, folderList))
         }
 
+        // Get the desktop file
         fun get(desktopFile: DesktopFile): ResponseEntity<DesktopFile> {
             return ResponseEntity
                 .accepted()

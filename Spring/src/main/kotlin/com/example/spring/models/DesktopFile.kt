@@ -4,14 +4,14 @@ data class DesktopFile(
 
     val name: String,
     val lastModified: Long,
-    val extension: String,
+    val type: String,
     val size: Long,
 
     val absolutePath: String,
-    val parentFolderPath: String,
+    val parentPath: String,
 
     val isFolder: Boolean,
     val isHidden: Boolean,
 
-    val tags: List<String>?
+    val tags: List<String>
 )

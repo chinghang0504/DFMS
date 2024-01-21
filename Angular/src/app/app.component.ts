@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
 import { SettingsService } from './services/settings.service';
 import { ModalService } from './services/modal.service';
-import { SystemTagsService } from './services/system-tags.service';
+import { FileTagsService } from './services/file-tags.service';
 
 @Component({
   selector: 'app-root',
@@ -14,12 +14,12 @@ export class AppComponent implements OnInit, AfterViewInit {
   @ViewChild('modalContainer', { read: ViewContainerRef }) modalViewContainerRef: ViewContainerRef;
 
   // Injection
-  constructor(private modalService: ModalService, private settingsService: SettingsService, private systemTagsService: SystemTagsService) { }
+  constructor(private settingsService: SettingsService, private fileTagsService: FileTagsService, private modalService: ModalService) { }
 
   // On init
   ngOnInit() {
     this.settingsService.loadSettings();
-    this.systemTagsService.loadTags();
+    this.fileTagsService.loadFileTags();
   }
 
   // After view init

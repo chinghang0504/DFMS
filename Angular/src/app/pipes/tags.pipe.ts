@@ -6,9 +6,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 export class TagsPipe implements PipeTransform {
 
   transform(tags: string[]): string {
-    if (!tags) {
-      return '';
-    } else if (tags.length === 0) {
+    if (tags.length === 0) {
       return 'No tags';
     } else {
       let str: string = `Tags: ${tags[0]}`;

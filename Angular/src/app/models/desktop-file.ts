@@ -2,11 +2,11 @@ export interface DesktopFile {
 
     name: string;
     lastModified: number;
-    extension: string;
+    type: string;
     size: number;
 
     absolutePath: string;
-    parentFolderPath: string;
+    parentPath: string;
 
     isFolder: boolean;
     isHidden: boolean;

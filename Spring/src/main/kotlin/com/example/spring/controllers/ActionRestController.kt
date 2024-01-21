@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RestController
 import java.awt.Desktop
 import java.io.File
 import java.nio.file.Files
-import kotlin.io.path.Path
 
 private const val OPEN_DESKTOP_FILE_URL: String = "/openDesktopFile";
 private const val DELETE_DESKTOP_FILE_URL: String = "/deleteDesktopFile";
@@ -17,25 +16,47 @@ private const val DELETE_DESKTOP_FILE_URL: String = "/deleteDesktopFile";
 @RestController
 class ActionRestController {
 
-    // Open the file
+    // Http open a desktop file
     @GetMapping(OPEN_DESKTOP_FILE_URL)
-    fun openDesktopFile(@RequestParam path: String): ResponseEntity<*> {
+    fun httpOpenDesktopFile(@RequestParam path: String): ResponseEntity<*> {
+        val file: File = File(path)
+
+        // File or folder does not exist
+        if (!file.exists()) {
+            return ResponseEntityManager.get(ErrorStatus.FILE_OR_FOLDER_DOES_NOT_EXIST)
+        }
+
         return try {
-            Desktop.getDesktop().open(File(path))
+            Desktop.getDesktop().open(file)
             ResponseEntityManager.get()
         } catch (e: Exception) {
-            ResponseEntityManager.get(ErrorStatus.UNABLE_TO_OPEN_FILE)
+            if (file.isDirectory) {
+                ResponseEntityManager.get(ErrorStatus.UNABLE_TO_OPEN_FOLDER)
+            } else {
+                ResponseEntityManager.get(ErrorStatus.UNABLE_TO_OPEN_FILE)
+            }
         }
     }
 
-    // Delete the file
+    // http delete a desktop file
     @GetMapping(DELETE_DESKTOP_FILE_URL)
-    fun deleteDesktopFile(@RequestParam path: String): ResponseEntity<*> {
+    fun httpDeleteDesktopFile(@RequestParam path: String): ResponseEntity<*> {
+        val file: File = File(path)
+
+        // File or folder does not exist
+        if (!file.exists()) {
+            return ResponseEntityManager.get(ErrorStatus.FILE_OR_FOLDER_DOES_NOT_EXIST)
+        }
+
         return try {
-            Files.delete(Path(path))
+            Files.delete(file.toPath())
             ResponseEntityManager.get()
         } catch (e: Exception) {
-            ResponseEntityManager.get(ErrorStatus.UNABLE_TO_DELETE_FILE)
+            if (file.isDirectory) {
+                ResponseEntityManager.get(ErrorStatus.UNABLE_TO_DELETE_FOLDER)
+            } else {
+                ResponseEntityManager.get(ErrorStatus.UNABLE_TO_DELETE_FILE)
+            }
         }
     }
 }

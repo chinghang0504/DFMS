@@ -1,35 +1,33 @@
 package com.example.spring
 
+import com.example.spring.ui.UI
+import org.springframework.boot.ApplicationRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.builder.SpringApplicationBuilder
-import java.awt.BorderLayout
+import org.springframework.context.annotation.Bean
 import java.awt.Desktop
-import java.awt.Font
 import java.net.URI
-import javax.swing.JFrame
-import javax.swing.JLabel
-import javax.swing.SwingConstants
-
 
 @SpringBootApplication
-class Application
+class Application {
 
-fun setUI() {
-    val frame: JFrame = JFrame("DFMS")
-    frame.setSize(300, 200)
-    frame.isVisible = true
-    frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
+    @Bean
+    fun applicationRunner(): ApplicationRunner {
+        return ApplicationRunner {
+            // Open the browser
+            Desktop.getDesktop().browse(URI("http://localhost:8080/"))
+        }
+    }
 
-    val label: JLabel = JLabel("DFMS", SwingConstants.CENTER)
-    label.setFont(Font("Serif", Font.PLAIN, 28))
-    frame.add(label, BorderLayout.CENTER)
+    companion object {
+
+        @JvmStatic
+        fun main(args: Array<String>) {
+            // Start a Spring
+            SpringApplicationBuilder(Application::class.java).headless(false).run(*args)
+
+            // Start a UI
+            UI()
+        }
+    }
 }
-
-fun main(args: Array<String>) {
-    SpringApplicationBuilder(Application::class.java).headless(false).run(*args)
-
-    setUI()
-
-    Desktop.getDesktop().browse(URI("http://localhost:8080/"))
-}
-

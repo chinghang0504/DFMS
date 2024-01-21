@@ -14,7 +14,9 @@ export class SettingsComponent {
   showHidden: boolean = false;
 
   // Injection
-  constructor(private settingsService: SettingsService, private modalService: ModalService) { }
+  constructor(
+    private settingsService: SettingsService, private modalService: ModalService
+  ) { }
 
   // On init
   ngOnInit() {
@@ -22,9 +24,14 @@ export class SettingsComponent {
   }
 
   // Update the UI data from the settings
-  updateUIData() {
+  private updateUIData() {
     this.homeFolderPath = this.settingsService.homeFolderPath;
     this.showHidden = this.settingsService.showHidden;
+  }
+
+  // Is not changed
+  isNotChanged(): boolean {
+    return this.homeFolderPath === this.settingsService.homeFolderPath && this.showHidden === this.settingsService.showHidden;
   }
 
   // On click the save button

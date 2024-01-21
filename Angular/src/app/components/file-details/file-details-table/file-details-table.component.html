@@ -1,0 +1,34 @@
+<table class="table table-bordered table-striped mb-5">
+    <thead>
+        <tr>
+            <th>Attribute</th>
+            <th>Value</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Name</td>
+            <td>{{ desktopFile.name }}</td>
+        </tr>
+        <tr>
+            <td>Last Modified</td>
+            <td>{{ desktopFile.lastModified | lastModified }}</td>
+        </tr>
+        <tr>
+            <td>Type</td>
+            <td>{{ desktopFile.type }}</td>
+        </tr>
+        <tr>
+            <td>Size</td>
+            <td>{{ desktopFile | size }}</td>
+        </tr>
+        <tr>
+            <td>Location</td>
+            <td>{{ desktopFile.absolutePath }}</td>
+        </tr>
+        <tr>
+            <td>Hidden</td>
+            <td>{{ desktopFile.isHidden ? 'Yes' : 'No' }}</td>
+        </tr>
+    </tbody>
+</table>

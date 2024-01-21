@@ -27,7 +27,7 @@ export class SettingsService {
     const homeFolderPath: string = window.localStorage.getItem(this.HOME_FOLDER_PATH_KEY);
     this._homeFolderPath = homeFolderPath ? homeFolderPath : this.DEFAULT_HOME_FOLDER_PATH;
 
-    this._showHidden = window.localStorage.getItem(this.SHOW_HIDDEN_KEY) === 'true';
+    this._showHidden = window.localStorage.getItem(this.SHOW_HIDDEN_KEY) === true.toString();
   }
 
   // Save settings into the local storage
@@ -35,12 +35,16 @@ export class SettingsService {
     window.localStorage.setItem(this.HOME_FOLDER_PATH_KEY, homeFolderPath);
     this._homeFolderPath = homeFolderPath;
 
-    window.localStorage.setItem(this.SHOW_HIDDEN_KEY, showHidden ? 'true' : 'false');
+    window.localStorage.setItem(this.SHOW_HIDDEN_KEY, showHidden.toString());
     this._showHidden = showHidden;
   }
 
   // Reset settings
   resetSettings() {
-    this.saveSettings(this.DEFAULT_HOME_FOLDER_PATH, false);
+    window.localStorage.removeItem(this.HOME_FOLDER_PATH_KEY);
+    this._homeFolderPath = this.DEFAULT_HOME_FOLDER_PATH;
+
+    window.localStorage.removeItem(this.SHOW_HIDDEN_KEY);
+    this._showHidden = false;
   }
 }
