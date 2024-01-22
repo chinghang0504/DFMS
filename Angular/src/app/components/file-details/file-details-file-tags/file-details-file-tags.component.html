@@ -7,7 +7,7 @@
     @else {
     @for (tag of desktopFile.tags; track $index) {
     <button class="btn btn-outline-secondary mx-1 rounded-pill"
-        (click)="onClickRemoveFileTag(tag)">
+        (click)="onClickRemoveFileTag($index)">
         {{ tag }}
     </button>
     }
@@ -15,19 +15,22 @@
 </div>
 
 <div class="form-group mb-5">
-    <button type="reset" class="btn btn-outline-primary mx-2" (click)="onClickClearButton()">Clear all tags</button>
-    <button type="submit" class="btn btn-primary mx-2" (click)="onClickSaveButton()">Save</button>
+    <button type="reset" class="btn btn-outline-primary mx-2"
+        [disabled]="isEmptyTags()"
+        (click)="onClickClearButton()">
+        Clear all file tags
+    </button>
 </div>
 
 <div class="mb-3">
     <h6 class="mb-3">Do you want to add any tags to this file?</h6>
 
-    @if (fileTagsService.isEmpty()) {
-    <p>There are no any tags.</p>
+    @if (isEmptyAvailableTags()) {
+    <p>There are no any file tags that you can add.</p>
     } @else {
-    @for (fileTag of fileTagsService.fileTags; track $index) {
-    <button class="btn btn-outline-secondary mx-1 rounded-pill" (click)="onClickAddFileTag(fileTag.name)">
-        {{ fileTag.name }}
+    @for (availableTag of availableTags; track $index) {
+    <button class="btn btn-outline-secondary mx-1 rounded-pill" (click)="onClickAddFileTag(availableTag)">
+        {{ availableTag }}
     </button>
     }
     }

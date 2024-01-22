@@ -1,6 +1,7 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component } from '@angular/core';
 import { FileTagsService } from '../../services/file-tags.service';
 import { ModalService } from '../../services/modal.service';
+import { SettingsService } from '../../services/settings.service';
 
 @Component({
   selector: 'app-file-tags',
@@ -17,13 +18,13 @@ export class FileTagsComponent {
   // Injection
   constructor(
     public fileTagsService: FileTagsService,
-    private modalService: ModalService
+    private settingsService: SettingsService, private modalService: ModalService
   ) { }
 
   // On click the remove all button
   onClickRemoveAllButton() {
     this.modalService.executeTwoButtonModal(
-      'Remove Confirmation', 'Do you want to remove all file tags?', 'Remove', 'Cancel',
+      'Remove Confirmation', 'Do you want to remove all file tags from the system?', 'Remove', 'Cancel',
       () => {
         this.fileTagsService.removeAllFileTags();
         this.clearTagData();
@@ -40,13 +41,21 @@ export class FileTagsComponent {
 
   // On click the file tag button
   onClickFileTagButton(tag: string) {
-    this.modalService.executeTwoButtonModal(
-      'Remove Confirmation', `Do you want to remove this file tag ${tag}?`, 'Remove', 'Cancel',
-      () => {
-        this.fileTagsService.removeFileTag(tag);
-        this.clearTagData();
-      }
-    );
+    const executeAction: () => void = () => {
+      this.fileTagsService.removeFileTag(tag);
+      this.clearTagData();
+    };
+
+    if (this.settingsService.removeDoubleConfirmation) {
+      this.modalService.executeTwoButtonModal(
+        'Remove Confirmation', `Do you want to remove ${tag} from the system?`, 'Remove', 'Cancel',
+        () => {
+          executeAction();
+        }
+      );
+    } else {
+      executeAction();
+    }
   }
 
   // On click the add button

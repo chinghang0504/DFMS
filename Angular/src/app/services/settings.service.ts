@@ -5,46 +5,51 @@ import { Injectable } from '@angular/core';
 })
 export class SettingsService {
 
-  // Keys and values
+  // Keys
   private readonly HOME_FOLDER_PATH_KEY: string = 'HOME_FOLDER_PATH';
   private readonly SHOW_HIDDEN_KEY: string = 'SHOW_HIDDEN';
+  private readonly REMOVE_DOUBLE_CONFIRMATION_KEY: string = 'REMOVE_DOUBLE_CONFIRMATION';
+
+  // Default values
   private readonly DEFAULT_HOME_FOLDER_PATH: string = 'C:\\';
+  private readonly DEFAULT_SHOW_HIDDEN: boolean = false;
+  private readonly DEFAULT_REMOVE_DOUBLE_CONFIRMATION: boolean = true;
 
-  // Internal data
-  private _homeFolderPath: string = '';
-  private _showHidden: boolean = false;
-
-  // Getters
-  get homeFolderPath() {
-    return this._homeFolderPath;
-  }
-  get showHidden() {
-    return this._showHidden;
-  }
+  // UI data
+  homeFolderPath: string = this.DEFAULT_HOME_FOLDER_PATH;
+  showHidden: boolean = this.DEFAULT_SHOW_HIDDEN;
+  removeDoubleConfirmation: boolean = this.DEFAULT_REMOVE_DOUBLE_CONFIRMATION;
 
   // Load settings from the local storage
   loadSettings() {
     const homeFolderPath: string = window.localStorage.getItem(this.HOME_FOLDER_PATH_KEY);
-    this._homeFolderPath = homeFolderPath ? homeFolderPath : this.DEFAULT_HOME_FOLDER_PATH;
+    this.homeFolderPath = homeFolderPath ? homeFolderPath : this.DEFAULT_HOME_FOLDER_PATH;
 
-    this._showHidden = window.localStorage.getItem(this.SHOW_HIDDEN_KEY) === true.toString();
+    const showHiddenString: string = window.localStorage.getItem(this.SHOW_HIDDEN_KEY);
+    this.showHidden = showHiddenString ? (showHiddenString === true.toString()) : this.DEFAULT_SHOW_HIDDEN;
+
+    const removeDoubleConfirmation: string = window.localStorage.getItem(this.REMOVE_DOUBLE_CONFIRMATION_KEY);
+    this.removeDoubleConfirmation = removeDoubleConfirmation ? (removeDoubleConfirmation === true.toString()) : this.DEFAULT_REMOVE_DOUBLE_CONFIRMATION;
   }
 
   // Save settings into the local storage
-  saveSettings(homeFolderPath: string, showHidden: boolean) {
-    window.localStorage.setItem(this.HOME_FOLDER_PATH_KEY, homeFolderPath);
-    this._homeFolderPath = homeFolderPath;
+  saveSettings() {
+    window.localStorage.setItem(this.HOME_FOLDER_PATH_KEY, this.homeFolderPath);
 
-    window.localStorage.setItem(this.SHOW_HIDDEN_KEY, showHidden.toString());
-    this._showHidden = showHidden;
+    window.localStorage.setItem(this.SHOW_HIDDEN_KEY, this.showHidden.toString());
+    
+    window.localStorage.setItem(this.REMOVE_DOUBLE_CONFIRMATION_KEY, this.removeDoubleConfirmation.toString());
   }
 
   // Reset settings
   resetSettings() {
     window.localStorage.removeItem(this.HOME_FOLDER_PATH_KEY);
-    this._homeFolderPath = this.DEFAULT_HOME_FOLDER_PATH;
+    this.homeFolderPath = this.DEFAULT_HOME_FOLDER_PATH;
 
     window.localStorage.removeItem(this.SHOW_HIDDEN_KEY);
-    this._showHidden = false;
+    this.showHidden = this.DEFAULT_SHOW_HIDDEN;
+
+    window.localStorage.removeItem(this.REMOVE_DOUBLE_CONFIRMATION_KEY);
+    this.removeDoubleConfirmation = this.DEFAULT_REMOVE_DOUBLE_CONFIRMATION;
   }
 }

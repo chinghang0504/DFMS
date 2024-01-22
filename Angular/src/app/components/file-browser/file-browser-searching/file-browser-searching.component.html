@@ -11,15 +11,15 @@
 
     @if (fileBrowserService.enableSearching) {
     <div class="mb-2">
-        <label class="h6" for="searchingName">Search by name</label>
+        <label class="h6" for="searchingName">Search by file name</label>
         <input type="text" class="form-control" id="searchingName" [(ngModel)]="fileBrowserService.searchingName"
             (input)="onInputSearchingName()">
     </div>
 
     <div class="mb-2">
-        <label class="h6">Search by tags</label>
+        <label class="h6">Search by file tags</label>
         @if (fileTagsService.isEmpty()) {
-        <p>There are no search tags.</p>
+        <p>There are no file tags.</p>
         } @else {
         <div>
             @for (fileTag of fileTagsService.fileTags; track $index) {
