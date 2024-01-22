@@ -1,4 +1,9 @@
 import { Injectable } from '@angular/core';
+import { CommunicationService } from './communication.service';
+import { finalize } from 'rxjs';
+import { SettingsPackage } from '../models/settings-package';
+import { ErrorPackage } from '../models/error-package';
+import { ModalService } from './modal.service';
 
 @Injectable({
   providedIn: 'root'
@@ -16,40 +21,88 @@ export class SettingsService {
   private readonly DEFAULT_REMOVE_DOUBLE_CONFIRMATION: boolean = true;
 
   // UI data
+  loading: boolean = true;
+  errorMessage: string = '';
   homeFolderPath: string = this.DEFAULT_HOME_FOLDER_PATH;
   showHidden: boolean = this.DEFAULT_SHOW_HIDDEN;
   removeDoubleConfirmation: boolean = this.DEFAULT_REMOVE_DOUBLE_CONFIRMATION;
 
+  // Injection
+  constructor(
+    private communicationService: CommunicationService, private modalService: ModalService
+  ) { }
+
   // Load settings from the local storage
   loadSettings() {
-    const homeFolderPath: string = window.localStorage.getItem(this.HOME_FOLDER_PATH_KEY);
-    this.homeFolderPath = homeFolderPath ? homeFolderPath : this.DEFAULT_HOME_FOLDER_PATH;
-
-    const showHiddenString: string = window.localStorage.getItem(this.SHOW_HIDDEN_KEY);
-    this.showHidden = showHiddenString ? (showHiddenString === true.toString()) : this.DEFAULT_SHOW_HIDDEN;
-
-    const removeDoubleConfirmation: string = window.localStorage.getItem(this.REMOVE_DOUBLE_CONFIRMATION_KEY);
-    this.removeDoubleConfirmation = removeDoubleConfirmation ? (removeDoubleConfirmation === true.toString()) : this.DEFAULT_REMOVE_DOUBLE_CONFIRMATION;
+    this.communicationService.httpLoadSettings()
+      .pipe(finalize(() => {
+        this.loading = false;
+      }))
+      .subscribe(
+        (res: SettingsService) => {
+          this.homeFolderPath = res.homeFolderPath;
+          this.showHidden = res.showHidden;
+          this.removeDoubleConfirmation = res.removeDoubleConfirmation;
+        }, (err) => {
+          this.errorMessage = 'Unable to connect to the desktop. Please make sure that the DFMS.exe is open.';
+        }
+      );
   }
 
   // Save settings into the local storage
   saveSettings() {
-    window.localStorage.setItem(this.HOME_FOLDER_PATH_KEY, this.homeFolderPath);
+    this.loading = true;
+    this.errorMessage = '';
 
-    window.localStorage.setItem(this.SHOW_HIDDEN_KEY, this.showHidden.toString());
-    
-    window.localStorage.setItem(this.REMOVE_DOUBLE_CONFIRMATION_KEY, this.removeDoubleConfirmation.toString());
+    const settingsPackage: SettingsPackage = {
+      'homeFolderPath': this.homeFolderPath,
+      'showHidden': this.showHidden,
+      'removeDoubleConfirmation': this.removeDoubleConfirmation
+    };
+
+    this.communicationService.httpSaveSettings(settingsPackage)
+      .pipe(finalize(() => {
+        this.loading = false;
+      }))
+      .subscribe(
+        (res) => { },
+        (err) => {
+          let errorMessage: string;
+
+          if (err['status'] === 400) {
+            errorMessage = (<ErrorPackage>err['error']).message;
+          } else {
+            errorMessage = 'Unable to connect to the desktop. Please make sure that the DFMS.exe is open.';
+          }
+
+          this.modalService.executeOneButtonModal(
+            'Error', errorMessage, 'OK'
+          );
+        }
+      );
   }
 
   // Reset settings
   resetSettings() {
-    window.localStorage.removeItem(this.HOME_FOLDER_PATH_KEY);
-    this.homeFolderPath = this.DEFAULT_HOME_FOLDER_PATH;
+    this.loading = true;
+    this.errorMessage = '';
 
-    window.localStorage.removeItem(this.SHOW_HIDDEN_KEY);
-    this.showHidden = this.DEFAULT_SHOW_HIDDEN;
-
-    window.localStorage.removeItem(this.REMOVE_DOUBLE_CONFIRMATION_KEY);
-    this.removeDoubleConfirmation = this.DEFAULT_REMOVE_DOUBLE_CONFIRMATION;
+    this.communicationService.httpSaveSettings()
+      .pipe(finalize(() => {
+        this.loading = false;
+      }))
+      .subscribe(
+        (res: SettingsService) => {
+          this.homeFolderPath = res.homeFolderPath;
+          this.showHidden = res.showHidden;
+          this.removeDoubleConfirmation = res.removeDoubleConfirmation;
+        }, (err) => {
+          if (err['status'] === 400) {
+            this.errorMessage = (<ErrorPackage>err['error']).message;
+          } else {
+            this.errorMessage = 'Unable to connect to the desktop. Please make sure that the DFMS.exe is open.';
+          }
+        }
+      )
   }
 }

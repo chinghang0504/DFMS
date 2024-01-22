@@ -1,9 +1,6 @@
 package com.example.spring.managers
 
-import com.example.spring.models.DesktopFile
-import com.example.spring.models.DesktopFilePackage
-import com.example.spring.models.ErrorPackage
-import com.example.spring.models.ErrorStatus
+import com.example.spring.models.*
 import org.springframework.http.ResponseEntity
 
 class ResponseEntityManager {
@@ -40,6 +37,14 @@ class ResponseEntityManager {
                 .accepted()
                 .header("Access-Control-Allow-Origin", "*")
                 .body(desktopFile)
+        }
+
+        // Get the settings package
+        fun get(settingsPackage: SettingsPackage): ResponseEntity<SettingsPackage> {
+            return ResponseEntity
+                .accepted()
+                .header("Access-Control-Allow-Origin", "*")
+                .body(settingsPackage)
         }
     }
 }

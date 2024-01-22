@@ -1,6 +1,7 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { SettingsPackage } from '../models/settings-package';
 
 @Injectable({
   providedIn: 'root'
@@ -14,6 +15,8 @@ export class CommunicationService {
   private readonly GET_DESKTOP_FILE_PACKAGE_URL: string = '/getDesktopFilePackage';
   private readonly GET_DESKTOP_FILE_URL: string = '/getDesktopFile';
   private readonly MODIFY_DESKTOP_FILE_URL: String = "/modifyDesktopFile";
+  private readonly LOAD_SETTINGS_URL: String = "/loadSettings";
+  private readonly SAVE_SETTINGS_URL: String = "/saveSettings";
 
   // Injection
   constructor(private httpClient: HttpClient) { }
@@ -55,7 +58,7 @@ export class CommunicationService {
     );
   }
 
-  // Gttp get a desktop file
+  // Http get a desktop file
   httpGetDesktopFile(desktopFilePath: string): Observable<Object> {
     return this.httpClient.get(
       this.SERVER_URL + this.GET_DESKTOP_FILE_URL,
@@ -77,6 +80,21 @@ export class CommunicationService {
           'tags': tags
         }
       }
+    );
+  }
+
+  // Http load settings
+  httpLoadSettings(): Observable<Object> {
+    return this.httpClient.get(
+      this.SERVER_URL + this.LOAD_SETTINGS_URL,
+    );
+  }
+
+  // Http save settings
+  httpSaveSettings(settingsPackage?: SettingsPackage): Observable<Object> {
+    return this.httpClient.post<SettingsPackage>(
+      this.SERVER_URL + this.SAVE_SETTINGS_URL,
+      settingsPackage
     );
   }
 }

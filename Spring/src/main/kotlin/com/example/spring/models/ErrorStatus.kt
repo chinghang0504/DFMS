@@ -22,5 +22,9 @@ enum class ErrorStatus(val status: HttpStatus, val message: String) {
 
     // MODIFY_DESKTOP_FILE_URL
     UNABLE_TO_MODIFY_FILE_TAGS(HttpStatus.BAD_REQUEST, "Unable to modify the tags in this file."),
-    UNABLE_TO_MODIFY_FOLDER_TAGS(HttpStatus.BAD_REQUEST, "Unable to modify the tags in this folder.")
+    UNABLE_TO_MODIFY_FOLDER_TAGS(HttpStatus.BAD_REQUEST, "Unable to modify the tags in this folder."),
+
+    // SAVE_SETTINGS_URL
+    UNABLE_TO_SAVE_SETTINGS(HttpStatus.BAD_REQUEST, "Unable to save the settings."),
+    UNABLE_TO_RESET_SETTINGS(HttpStatus.BAD_REQUEST, "Unable to reset the settings.")
 }

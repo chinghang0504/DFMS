@@ -14,7 +14,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   @ViewChild('modalContainer', { read: ViewContainerRef }) modalViewContainerRef: ViewContainerRef;
 
   // Injection
-  constructor(private settingsService: SettingsService, private fileTagsService: FileTagsService, private modalService: ModalService) { }
+  constructor(public settingsService: SettingsService, private fileTagsService: FileTagsService, private modalService: ModalService) { }
 
   // On init
   ngOnInit() {
