@@ -23,8 +23,8 @@
     <h5 class="mb-3">Do you want to add a file tag?</h5>
     <div class="form-group mb-3">
         <label for="tag">File Tag</label>
-        <input type="text" class="form-control" id="tag" [(ngModel)]="tag" (input)="onInputTag()">
+        <input type="text" class="form-control" id="tag" [(ngModel)]="tag" (input)="onInputTag()" (keydown.enter)="onClickAddButton()" #tagInput>
         <small class="form-text text-muted">{{ helpMessage }}</small>
     </div>
-    <button class="btn btn-primary mx-2" (click)="onClickAddButton()">Add a file tag</button>
+    <button class="btn btn-primary mx-2" [disabled]="!validTag" (click)="onClickAddButton()">Add a file tag</button>
 </div>

@@ -1,7 +1,7 @@
 package com.example.spring.controllers
 
-import com.example.spring.models.ErrorStatus
 import com.example.spring.managers.ResponseEntityManager
+import com.example.spring.models.ErrorStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -27,7 +27,7 @@ class ActionRestController {
         }
 
         return try {
-            Desktop.getDesktop().open(file)
+            ProcessBuilder("cmd", "/c", "start", "\"\"", path).start()
             ResponseEntityManager.get()
         } catch (e: Exception) {
             if (file.isDirectory) {

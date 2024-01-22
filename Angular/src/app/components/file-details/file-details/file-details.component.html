@@ -1,10 +1,14 @@
 <div class="my-3">
-    <i class="bi bi-arrow-left-square h3 mx-3" (click)="onClickBackButton()"></i>
-    <h3 class="d-inline">File Details</h3>
-    <i class="bi bi-arrow-clockwise h3 float-end"
+    <button class="btn btn-outline-secondary me-3"
+        (click)="onClickBackButton()">
+        <i class="bi bi-arrow-90deg-left"></i>
+    </button>
+    <h3 class="d-inline align-middle">File Details</h3>
+    <button class="btn btn-outline-secondary float-end"
         [ngClass]="{ 'invisible': !desktopFile }"
         (click)="onClickUpdateButton()">
-    </i>
+        <i class="bi bi-arrow-clockwise"></i>
+    </button>
 </div>
 
 @if (loading) {

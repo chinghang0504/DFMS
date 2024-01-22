@@ -63,7 +63,7 @@ export class FileTagsService {
   }
 
   // Find the index of the specific file tag
-  private findFileTagIndex(tag: string): number {
+  findFileTagIndex(tag: string): number {
     return this._fileTags.findIndex((fileTag: FileTag) => fileTag.name === tag);
   }
 

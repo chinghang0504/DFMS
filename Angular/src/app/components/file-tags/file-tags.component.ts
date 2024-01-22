@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { FileTagsService } from '../../services/file-tags.service';
 import { ModalService } from '../../services/modal.service';
 
@@ -12,6 +12,7 @@ export class FileTagsComponent {
   // UI data
   tag: string = '';
   helpMessage: string = '';
+  validTag: boolean = false;
 
   // Injection
   constructor(
@@ -34,6 +35,7 @@ export class FileTagsComponent {
   private clearTagData() {
     this.tag = '';
     this.helpMessage = '';
+    this.validTag = false;
   }
 
   // On click the file tag button
@@ -49,17 +51,30 @@ export class FileTagsComponent {
 
   // On click the add button
   onClickAddButton() {
-    if (!this.tag) {
-      this.helpMessage = 'File tag cannot be empty.';
-    } else if (!this.fileTagsService.addFileTag(this.tag)) {
-      this.helpMessage = 'This file tag already exists.';
-    } else {
+    if (this.checkTag() && this.fileTagsService.addFileTag(this.tag)) {
       this.clearTagData();
     }
   }
 
   // On input the tag
   onInputTag() {
+    this.checkTag();
+  }
+
+  // Check the tag
+  checkTag(): boolean {
+    if (!this.tag) {
+      this.helpMessage = 'File tag cannot be empty.';
+      this.validTag = false;
+      return false;
+    } else if (this.fileTagsService.findFileTagIndex(this.tag) !== -1) {
+      this.helpMessage = 'This file tag already exists.';
+      this.validTag = false;
+      return false;
+    }
+
     this.helpMessage = '';
+    this.validTag = true;
+    return true;
   }
 }
