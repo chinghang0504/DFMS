@@ -26,5 +26,9 @@ enum class ErrorStatus(val status: HttpStatus, val message: String) {
 
     // SAVE_SETTINGS_URL
     UNABLE_TO_SAVE_SETTINGS(HttpStatus.BAD_REQUEST, "Unable to save the settings."),
-    UNABLE_TO_RESET_SETTINGS(HttpStatus.BAD_REQUEST, "Unable to reset the settings.")
+    UNABLE_TO_RESET_SETTINGS(HttpStatus.BAD_REQUEST, "Unable to reset the settings."),
+
+    // SAVE_FILE_TAGS_URL
+    UNABLE_TO_SAVE_FILE_TAGS(HttpStatus.BAD_REQUEST, "Unable to save the file tags."),
+    UNABLE_TO_CLEAR_ALL_FILE_TAGS(HttpStatus.BAD_REQUEST, "Unable to clear all the file tags.")
 }

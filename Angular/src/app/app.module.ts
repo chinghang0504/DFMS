@@ -6,7 +6,6 @@ import { DatePipe } from '@angular/common';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { SettingsComponent } from './components/settings/settings.component';
-import { AboutComponent } from './components/about/about.component';
 import { PageNotFoundComponent } from './components/page-not-found/page-not-found.component';
 import { NavbarComponent } from './components/ui/navbar/navbar.component';
 import { TwoButtonModalComponent } from './components/ui/modal/two-button-modal/two-button-modal.component';
@@ -28,7 +27,6 @@ import { FileTagsComponent } from './components/file-tags/file-tags.component';
   declarations: [
     AppComponent,
     SettingsComponent,
-    AboutComponent,
     PageNotFoundComponent,
     NavbarComponent,
     TwoButtonModalComponent,

@@ -1,16 +1,22 @@
 import { Injectable } from '@angular/core';
 import { FileTag } from '../models/file-tag';
+import { CommunicationService } from './communication.service';
+import { FileTagsPackage } from '../models/file-tags-package';
+import { ErrorPackage } from '../models/error-package';
+import { ModalService } from './modal.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FileTagsService {
 
-  // Keys
-  private readonly TAGS_KEY: string = 'TAGS';
-
   // Internal data
   private _fileTags: FileTag[] = [];
+
+  // Injection
+  constructor(
+    private communicationService: CommunicationService, private modalService: ModalService
+  ) { }
 
   // Getters
   get fileTags() {
@@ -23,14 +29,7 @@ export class FileTagsService {
   }
 
   // Load file tags from the local storage
-  loadFileTags() {
-    const tagString: string = window.localStorage.getItem(this.TAGS_KEY);
-    if (!tagString) {
-      this._fileTags = [];
-      return;
-    }
-
-    const tags: string[] = JSON.parse(tagString);
+  loadFileTags(tags: string[]) {
     const fileTags: FileTag[] = tags
       .map((tag: string) => <FileTag>{
         name: tag,
@@ -49,8 +48,17 @@ export class FileTagsService {
 
   // Remove all the file tags in the local storage
   removeAllFileTags() {
-    window.localStorage.removeItem(this.TAGS_KEY);
-    this._fileTags = [];
+    this.communicationService.httpSaveFileTags()
+      .subscribe(
+        (res: FileTagsPackage) => {
+          this.loadFileTags(res.fileTags);
+        }, (err) => {
+          const errorMessage: string = err['status'] === 400 ? (<ErrorPackage>err['error']).message : 'Unable to connect to the desktop. Please make sure that the DFMS.exe is open.';
+          this.modalService.executeOneButtonModal(
+            'Error', errorMessage, 'OK'
+          );
+        }
+      );
   }
 
   // Remove a tag
@@ -69,13 +77,21 @@ export class FileTagsService {
 
   // Save tags into the local storage
   private saveFileTags() {
-    if (this.isEmpty()) {
-      window.localStorage.removeItem(this.TAGS_KEY);
-      return;
-    }
+    const fileTagsPackage: FileTagsPackage = {
+      'fileTags': this._fileTags.map((fileTag: FileTag) => fileTag.name)
+    };
 
-    const tags: string[] = this._fileTags.map((fileTag: FileTag) => fileTag.name);
-    window.localStorage.setItem(this.TAGS_KEY, JSON.stringify(tags));
+    this.communicationService.httpSaveFileTags(fileTagsPackage)
+      .subscribe(
+        (res: FileTagsPackage) => {
+          this.loadFileTags(res.fileTags);
+        }, (err) => {
+          const errorMessage: string = err['status'] === 400 ? (<ErrorPackage>err['error']).message : 'Unable to connect to the desktop. Please make sure that the DFMS.exe is open.';
+          this.modalService.executeOneButtonModal(
+            'Error', errorMessage, 'OK'
+          );
+        }
+      );
   }
 
   // Add a file tag

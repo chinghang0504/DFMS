@@ -1,7 +1,8 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { SettingsPackage } from '../models/settings-package';
+import { FileTagsPackage } from '../models/file-tags-package';
 
 @Injectable({
   providedIn: 'root'
@@ -15,8 +16,9 @@ export class CommunicationService {
   private readonly GET_DESKTOP_FILE_PACKAGE_URL: string = '/getDesktopFilePackage';
   private readonly GET_DESKTOP_FILE_URL: string = '/getDesktopFile';
   private readonly MODIFY_DESKTOP_FILE_URL: String = "/modifyDesktopFile";
-  private readonly LOAD_SETTINGS_URL: String = "/loadSettings";
+  private readonly LOAD_SAVING_URL: String = "/loadSaving";
   private readonly SAVE_SETTINGS_URL: String = "/saveSettings";
+  private readonly SAVE_FILE_TAGS_URL: String = "/saveFileTags";
 
   // Injection
   constructor(private httpClient: HttpClient) { }
@@ -83,18 +85,26 @@ export class CommunicationService {
     );
   }
 
-  // Http load settings
-  httpLoadSettings(): Observable<Object> {
+  // Http load the saving
+  httpLoadSaving(): Observable<Object> {
     return this.httpClient.get(
-      this.SERVER_URL + this.LOAD_SETTINGS_URL,
+      this.SERVER_URL + this.LOAD_SAVING_URL,
     );
   }
 
-  // Http save settings
+  // Http save the settings
   httpSaveSettings(settingsPackage?: SettingsPackage): Observable<Object> {
     return this.httpClient.post<SettingsPackage>(
       this.SERVER_URL + this.SAVE_SETTINGS_URL,
       settingsPackage
+    );
+  }
+
+  // Http save the file tags
+  httpSaveFileTags(fileTagsPackage?: FileTagsPackage): Observable<Object> {
+    return this.httpClient.post<FileTagsPackage>(
+      this.SERVER_URL + this.SAVE_FILE_TAGS_URL,
+      fileTagsPackage
     );
   }
 }
