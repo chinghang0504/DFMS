@@ -4,6 +4,7 @@ import com.example.spring.managers.ResponseEntityManager
 import com.example.spring.models.ErrorStatus
 import com.google.gson.Gson
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
@@ -14,6 +15,7 @@ import java.nio.file.attribute.UserDefinedFileAttributeView
 
 private const val MODIFY_DESKTOP_FILE_URL: String = "/modifyDesktopFile"
 
+@CrossOrigin("http://localhost:4200")
 @RestController
 class DataModifyRestController {
 

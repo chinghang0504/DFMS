@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { SortingMode } from '../models/sorting-mode';
 import { DesktopFile } from '../models/desktop-file';
-import { DesktopFilePackage } from '../models/desktop-file-package';
+import { DesktopFilesPackage } from '../packages/desktop-file-package';
 import { SettingsService } from './settings.service';
 import { FileTagsService } from './file-tags.service';
 import { FileTag } from '../models/file-tag';
@@ -62,7 +62,7 @@ export class FileBrowserService {
   }
 
   // Update the desktop files
-  updateDesktopFiles(desktopFilePackage?: DesktopFilePackage) {
+  updateDesktopFiles(desktopFilePackage?: DesktopFilesPackage) {
     this.terminateWorker();
 
     if (desktopFilePackage) {

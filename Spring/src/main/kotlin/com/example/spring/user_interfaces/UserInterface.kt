@@ -1,4 +1,4 @@
-package com.example.spring.ui
+package com.example.spring.user_interfaces
 
 import java.awt.BorderLayout
 import java.awt.Font
@@ -6,7 +6,7 @@ import javax.swing.JFrame
 import javax.swing.JLabel
 import javax.swing.SwingConstants
 
-class UI {
+class UserInterface {
 
     val title: String = "DFMS"
 

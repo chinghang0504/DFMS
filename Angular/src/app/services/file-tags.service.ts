@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { FileTag } from '../models/file-tag';
 import { CommunicationService } from './communication.service';
-import { FileTagsPackage } from '../models/file-tags-package';
-import { ErrorPackage } from '../models/error-package';
+import { FileTagsPackage } from '../packages/file-tags-package';
+import { ErrorPackage } from '../packages/error-package';
 import { ModalService } from './modal.service';
 
 @Injectable({

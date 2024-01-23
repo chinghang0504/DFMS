@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ModalService } from '../../../services/modal.service';
 import { CommunicationService } from '../../../services/communication.service';
-import { ErrorPackage } from '../../../models/error-package';
+import { ErrorPackage } from '../../../packages/error-package';
 import { FileTagsService } from '../../../services/file-tags.service';
 import { FileDetailsComponent } from '../file-details/file-details.component';
 import { DesktopFile } from '../../../models/desktop-file';

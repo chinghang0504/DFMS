@@ -3,6 +3,7 @@ package com.example.spring.controllers
 import com.example.spring.managers.ResponseEntityManager
 import com.example.spring.models.ErrorStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
@@ -12,6 +13,7 @@ import java.nio.file.Files
 private const val OPEN_DESKTOP_FILE_URL: String = "/openDesktopFile";
 private const val DELETE_DESKTOP_FILE_URL: String = "/deleteDesktopFile";
 
+@CrossOrigin("http://localhost:4200")
 @RestController
 class ActionRestController {
 

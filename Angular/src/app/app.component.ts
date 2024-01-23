@@ -4,7 +4,7 @@ import { ModalService } from './services/modal.service';
 import { FileTagsService } from './services/file-tags.service';
 import { CommunicationService } from './services/communication.service';
 import { finalize } from 'rxjs';
-import { SavingPackage } from './models/saving-package';
+import { SavingPackage } from './packages/saving-package';
 
 @Component({
   selector: 'app-root',

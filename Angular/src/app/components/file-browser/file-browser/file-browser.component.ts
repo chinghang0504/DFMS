@@ -4,8 +4,8 @@ import { FileBrowserService } from '../../../services/file-browser.service';
 import { SettingsService } from '../../../services/settings.service';
 import { Subscription } from 'rxjs';
 import { CommunicationService } from '../../../services/communication.service';
-import { DesktopFilePackage } from '../../../models/desktop-file-package';
-import { ErrorPackage } from '../../../models/error-package';
+import { DesktopFilesPackage } from '../../../packages/desktop-file-package';
+import { ErrorPackage } from '../../../packages/error-package';
 
 @Component({
   selector: 'app-file-browser',
@@ -83,7 +83,7 @@ export class FileBrowserComponent implements OnInit, OnDestroy {
 
     this._subscription = this.communicationService.httpGetDesktopFilePackage(this.fileBrowserService.currentFolderPath, this.fileBrowserService.allFiles)
       .subscribe(
-        (res: DesktopFilePackage) => {
+        (res: DesktopFilesPackage) => {
           this.fileBrowserService.updateDesktopFiles(res);
         }, (err) => {
           if (err['status'] === 400) {

@@ -2,13 +2,13 @@ package com.example.spring.controllers
 
 import com.example.spring.managers.ResponseEntityManager
 import com.example.spring.models.*
+import com.example.spring.packages.FileTagsPackage
+import com.example.spring.packages.SavingPackage
+import com.example.spring.packages.SettingsPackage
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import java.io.File
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
@@ -21,6 +21,7 @@ private const val SAVING_FILE_NAME: String = "saving.json"
 
 private val DEFAULT_SAVING_PACKAGE: SavingPackage = SavingPackage(SettingsPackage.getDefault(), FileTagsPackage.getDefault())
 
+@CrossOrigin("http://localhost:4200")
 @RestController
 class SavingRestController {
 

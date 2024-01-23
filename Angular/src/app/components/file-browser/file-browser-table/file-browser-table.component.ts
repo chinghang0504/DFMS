@@ -4,7 +4,7 @@ import { FileBrowserService } from '../../../services/file-browser.service';
 import { CommunicationService } from '../../../services/communication.service';
 import { ModalService } from '../../../services/modal.service';
 import { DesktopFile } from '../../../models/desktop-file';
-import { ErrorPackage } from '../../../models/error-package';
+import { ErrorPackage } from '../../../packages/error-package';
 
 @Component({
   selector: 'app-file-browser-table',

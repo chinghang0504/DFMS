@@ -1,6 +1,6 @@
 package com.example.spring
 
-import com.example.spring.ui.UI
+import com.example.spring.user_interfaces.UserInterface
 import org.springframework.boot.ApplicationRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.builder.SpringApplicationBuilder
@@ -27,7 +27,7 @@ class Application {
             SpringApplicationBuilder(Application::class.java).headless(false).run(*args)
 
             // Start a UI
-            UI()
+            UserInterface()
         }
     }
 }

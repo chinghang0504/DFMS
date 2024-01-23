@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { DesktopFile } from '../../../models/desktop-file';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommunicationService } from '../../../services/communication.service';
-import { ErrorPackage } from '../../../models/error-package';
+import { ErrorPackage } from '../../../packages/error-package';
 import { finalize, take } from 'rxjs';
 
 @Component({

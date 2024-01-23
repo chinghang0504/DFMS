@@ -1,8 +1,8 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { SettingsPackage } from '../models/settings-package';
-import { FileTagsPackage } from '../models/file-tags-package';
+import { SettingsPackage } from '../packages/settings-package';
+import { FileTagsPackage } from '../packages/file-tags-package';
 
 @Injectable({
   providedIn: 'root'
@@ -88,7 +88,7 @@ export class CommunicationService {
   // Http load the saving
   httpLoadSaving(): Observable<Object> {
     return this.httpClient.get(
-      this.SERVER_URL + this.LOAD_SAVING_URL,
+      this.SERVER_URL + this.LOAD_SAVING_URL
     );
   }
 

@@ -1,10 +1,12 @@
 {
-  "settingsPackage": {
-    "homeFolderPath": "C:\\",
-    "showHidden": false,
-    "removeDoubleConfirmation": true
+  "Settings": {
+    "HomeFolderPath": "C:\\",
+    "ShowHidden": false,
+    "RemoveDoubleConfirmation": true
   },
-  "fileTagsPackage": {
-    "fileTags": []
+  "FileTags": {
+    "Tags": [
+      "CS"
+    ]
   }
 }

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { CommunicationService } from './communication.service';
-import { SettingsPackage } from '../models/settings-package';
-import { ErrorPackage } from '../models/error-package';
+import { SettingsPackage } from '../packages/settings-package';
+import { ErrorPackage } from '../packages/error-package';
 import { ModalService } from './modal.service';
 
 @Injectable({

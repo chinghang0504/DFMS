@@ -9,6 +9,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
@@ -22,6 +23,7 @@ private const val GET_DESKTOP_FILE_PACKAGE_URL: String = "/getDesktopFilePackage
 private const val GET_DESKTOP_FILE_URL: String = "/getDesktopFile"
 internal const val TAGS_KEY: String = "TAGS"
 
+@CrossOrigin("http://localhost:4200")
 @RestController
 class DataAccessRestController {
 

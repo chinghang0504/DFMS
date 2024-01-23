@@ -1,6 +1,10 @@
 package com.example.spring.managers
 
 import com.example.spring.models.*
+import com.example.spring.packages.CommunicationPackage
+import com.example.spring.packages.DesktopFilesPackage
+import com.example.spring.packages.ErrorPackage
+import org.springframework.http.HttpHeaders
 import org.springframework.http.ResponseEntity
 
 class ResponseEntityManager {
@@ -11,7 +15,6 @@ class ResponseEntityManager {
         fun get(): ResponseEntity<Any> {
             return ResponseEntity
                 .accepted()
-                .header("Access-Control-Allow-Origin", "*")
                 .build()
         }
 
@@ -19,23 +22,27 @@ class ResponseEntityManager {
         fun get(errorStatus: ErrorStatus): ResponseEntity<ErrorPackage> {
             return ResponseEntity
                 .status(errorStatus.status)
-                .header("Access-Control-Allow-Origin", "*")
                 .body(ErrorPackage(errorStatus.message))
         }
 
         // Get the desktop file package
-        fun get(fileList: List<DesktopFile>, folderList: List<DesktopFile>): ResponseEntity<DesktopFilePackage> {
+        fun get(fileList: List<DesktopFile>, folderList: List<DesktopFile>): ResponseEntity<DesktopFilesPackage> {
             return ResponseEntity
                 .accepted()
-                .header("Access-Control-Allow-Origin", "*")
-                .body(DesktopFilePackage(fileList, folderList))
+                .body(DesktopFilesPackage(fileList, folderList))
+        }
+
+        // Get the desktop file
+        fun get(desktopFile: DesktopFile): ResponseEntity<DesktopFile> {
+            return ResponseEntity
+                .accepted()
+                .body(desktopFile)
         }
 
         // Get the package
-        fun<T> get(responseEntityPackage: T): ResponseEntity<T> {
+        fun get(responseEntityPackage: CommunicationPackage): ResponseEntity<CommunicationPackage> {
             return ResponseEntity
                 .accepted()
-                .header("Access-Control-Allow-Origin", "*")
                 .body(responseEntityPackage)
         }
     }
