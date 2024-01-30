@@ -1,0 +1,57 @@
+<div class="mb-3">
+    <button class="btn mb-2" type="button"
+        [ngClass]="{ 'btn-outline-primary': fileBrowserService.enableFilter, 'btn-primary': !fileBrowserService.enableFilter }"
+        (click)="onClickFilterButton()">
+        {{ fileBrowserService.enableFilter ? 'Disable Filter' : 'Enable Filter' }} <i class="bi bi-funnel"></i>
+    </button>
+    <span class="mx-3">
+        {{ fileBrowserService.resultSize }} results found.
+    </span>
+
+    @if (fileBrowserService.enableFilter) {
+    <div class="mb-2">
+        <label class="h6">File type</label>
+        <div>
+            <button class="btn mx-1 rounded-pill"
+                [ngClass]="{ 'btn-outline-warning': !fileBrowserService.fileterIsFile, 'btn-warning': fileBrowserService.fileterIsFile }"
+                (click)="onClickFileTypeButton(true)">file
+            </button>
+            <button class="btn mx-1 rounded-pill"
+                [ngClass]="{ 'btn-outline-warning': !fileBrowserService.fileterIsFolder, 'btn-warning': fileBrowserService.fileterIsFolder }"
+                (click)="onClickFileTypeButton(false)">folder
+            </button>
+        </div>
+    </div>
+
+    <div class="mb-2">
+        <label class="h6" for="filterFileName">File name</label>
+        <div class="input-group">
+            <input type="text" class="form-control" id="filterFileName" [(ngModel)]="fileBrowserService.filterFileName"
+                (input)="onInputFileName()">
+            <div class="input-group-append">
+                <button class="btn btn-outline-secondary" (click)="onClickClearButton()">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="mb-2">
+        <label class="h6">File Tags</label>
+        @if (tagsService.isTagsEmpty) {
+        <p>There are no tags in the system.</p>
+        } @else {
+        <div>
+            @for (fileTag of tagsService.fileTags; track $index) {
+            <button class="btn mx-1 rounded-pill"
+                [ngClass]="{ 'btn-outline-warning': !fileTag.active, 'btn-warning': fileTag.active }"
+                (click)="onClickFileTagButton(fileTag)">
+                {{ fileTag.tag }}
+            </button>
+            }
+        </div>
+        }
+    </div>
+    }
+</div>

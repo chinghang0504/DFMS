@@ -10,8 +10,9 @@ import { FileBrowserComponent } from '../file-browser/file-browser.component';
 })
 export class FileBrowserCurrentFolderComponent {
 
-  // Parent
-  @Input() parent: FileBrowserComponent;
+  // Private data
+  @Input()
+  private parent: FileBrowserComponent;
 
   // Injection
   constructor(
@@ -26,48 +27,38 @@ export class FileBrowserCurrentFolderComponent {
 
   // On click the parent button
   onClickParentButton() {
-    const regExpMatchArray: RegExpMatchArray = this.fileBrowserService.currentFolderPath.match(/[\\\/]/g);
-    let numOfSplits: number = regExpMatchArray ? regExpMatchArray.length : 0;
+    const currentFolderPath: string = this.fileBrowserService.currentFolderPath;
 
-    // Only one split
-    if (numOfSplits === 1) {
-      const lastChar: string = this.fileBrowserService.currentFolderPath.slice(-1);
+    // Remove the last char if it is a splitter
+    const lastChar: string = currentFolderPath.slice(-1);
+    let newCurrentFolderPath: string = (lastChar === '\\' || lastChar === '/') ? currentFolderPath.slice(0, currentFolderPath.length - 1) : currentFolderPath.slice();
 
-      // The last character is a split
-      if (lastChar === '\\' || lastChar === '/') {
-        this.fileBrowserService.allFiles = false;
-        this.parent.getDesktopFilePackage();
-      }
-      // The last character is not a split
-      else {
-        const splitIndex: number = Math.max(this.fileBrowserService.currentFolderPath.lastIndexOf('\\'), this.fileBrowserService.currentFolderPath.lastIndexOf('/'));
-        this.parent.navigate(this.fileBrowserService.currentFolderPath.substring(0, splitIndex + 1));
-      }
-
-      return;
+    // Extract a string before the last splitter
+    const index: number = Math.max(newCurrentFolderPath.lastIndexOf('\\'), newCurrentFolderPath.lastIndexOf('/'));
+    if (index !== -1) {
+      newCurrentFolderPath = newCurrentFolderPath.slice(0, index);
     }
 
-    // More than one splits
-    if (numOfSplits > 1) {
-      const lastChar: string = this.fileBrowserService.currentFolderPath.slice(-1);
-      let tempCurrentFolderPath: string = this.fileBrowserService.currentFolderPath;
+    // Add a splitter if the string does not have one
+    const regExpMatchArray: RegExpMatchArray = newCurrentFolderPath.match(/[\\\/]/g);
+    if (!regExpMatchArray) {
+      newCurrentFolderPath += '\\';
+    }
 
-      // The last character is a split 
-      if (lastChar === '\\' || lastChar === '/') {
-        tempCurrentFolderPath = tempCurrentFolderPath.substring(0, tempCurrentFolderPath.length - 1);
-        numOfSplits--;
-      }
-
-      const splitIndex: number = Math.max(tempCurrentFolderPath.lastIndexOf('\\'), tempCurrentFolderPath.lastIndexOf('/'));
-      this.parent.navigate(tempCurrentFolderPath.substring(0, numOfSplits === 1 ? splitIndex + 1 : splitIndex));
+    // Compare to the original string
+    if (newCurrentFolderPath === currentFolderPath) {
+      this.fileBrowserService.allLevels = false;
+      this.fileBrowserService.getDesktopFiles();
+    } else {
+      this.parent.navigate(newCurrentFolderPath);
     }
   }
 
   // On click the home button
   onClickHomeButton() {
-    if (this.fileBrowserService.currentFolderPath === this.settingsService.homeFolderPath) {
-      this.fileBrowserService.allFiles = false;
-      this.parent.getDesktopFilePackage();
+    if (this.fileBrowserService.currentFolderPath === this.settingsService.originalSettingsPackage.homeFolderPath) {
+      this.fileBrowserService.allLevels = false;
+      this.fileBrowserService.getDesktopFiles();
     } else {
       this.parent.navigateHomeFolder();
     }
@@ -75,12 +66,12 @@ export class FileBrowserCurrentFolderComponent {
 
   // On click the fresh button
   onClickRefreshButton() {
-    this.parent.getDesktopFilePackage();
+    this.fileBrowserService.getDesktopFiles();
   }
 
-  // On click the file option button
-  onClickFileOptionButton(allFiles: boolean) {
-    this.fileBrowserService.allFiles = allFiles;
-    this.parent.getDesktopFilePackage();
+  // On click the level button
+  onClickLevelButton() {
+    this.fileBrowserService.allLevels = !this.fileBrowserService.allLevels;
+    this.fileBrowserService.getDesktopFiles();
   }
 }

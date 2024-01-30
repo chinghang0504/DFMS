@@ -1,18 +1,10 @@
 <div class="mb-3">
-    @if (fileBrowserService.loading) {
-    <p>Loading...</p>
-    } @else if (fileBrowserService.errorMessage) {
-    <div class="alert alert-danger d-flex align-items-center fade show">
-        <i class="bi-exclamation-octagon-fill"></i>
-        <strong class="mx-2">Error!</strong>{{ fileBrowserService.errorMessage }}
-    </div>
-    } @else {
     <app-file-browser-table-page></app-file-browser-table-page>
     <table class="table table-hover">
         <thead>
             <tr>
                 <th style="width: 54%;" (click)="onClickTableHeader(0)">
-                    Name ({{ fileBrowserService.desktopFiles1000.length }})
+                    Name ({{ fileBrowserService.desktopFilesPortion.length }})
                     <i class="bi bi-caret-up-fill" [hidden]="fileBrowserService.sortingMode !== 0"></i>
                     <i class="bi bi-caret-down-fill" [hidden]="fileBrowserService.sortingMode !== 1"></i>
                 </th>
@@ -37,9 +29,10 @@
             </tr>
         </thead>
         <tbody>
-            @for (desktopFile of fileBrowserService.desktopFiles1000; track $index) {
+            @for (desktopFile of fileBrowserService.desktopFilesPortion; track $index) {
             <tr [ngClass]="{ 'table-light': desktopFile.isFolder }">
-                <td class="align-middle" title="{{ desktopFile.tags | tags }}" (click)="onClickElementName(desktopFile)">
+                <td class="align-middle" title="{{ desktopFile.tags | tags }}"
+                    (click)="onClickElementName(desktopFile)">
                     {{ desktopFile.name }}
                 </td>
                 <td class="align-middle text-center">
@@ -52,22 +45,17 @@
                     {{ desktopFile | size }}
                 </td>
                 <td class="align-middle text-center">
-                    <button type="button" class="btn btn-outline-secondary" title="Open file"
+                    <button type="button" class="btn btn-outline-secondary btn-sm mx-1" title="Open file"
                         [ngClass]="{ 'invisible': desktopFile.isFolder }"
                         (click)="onClickOpenFileButton(desktopFile.absolutePath)">
                         <i class="bi bi-file-earmark"></i>
                     </button>
-                    <button type="button" class="btn btn-outline-secondary"
+                    <button type="button" class="btn btn-outline-secondary btn-sm mx-1"
                         [title]="desktopFile.isFolder ? 'Open folder' : 'Show in folder'"
                         (click)="onClickOpenFileButton(desktopFile.isFolder ? desktopFile.absolutePath : desktopFile.parentPath)">
                         <i class="bi bi-folder"></i>
                     </button>
-                    <button type="button" class="btn btn-outline-secondary" title="Delete file"
-                        [ngClass]="{ 'invisible': desktopFile.isFolder }"
-                        (click)="onClickDeleteFileButton(desktopFile)">
-                        <i class="bi bi-trash"></i>
-                    </button>
-                    <button type="button" class="btn btn-outline-secondary" title="File Details"
+                    <button type="button" class="btn btn-outline-secondary btn-sm mx-1" title="File Details"
                         (click)="onClickFileDetailsButton(desktopFile.absolutePath)">
                         <i class="bi bi-bookmark"></i>
                     </button>
@@ -77,5 +65,4 @@
         </tbody>
     </table>
     <app-file-browser-table-page></app-file-browser-table-page>
-    }
 </div>

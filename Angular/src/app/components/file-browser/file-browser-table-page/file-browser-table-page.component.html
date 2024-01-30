@@ -1,23 +1,23 @@
 @if (fileBrowserService.totalPageNumber > 1) {
-    <div class="container">
-        <div class="row">
-            <div class="col-md-2">
-                <div class="input-group">
-                    <span class="input-group-text">Page</span>
-                    <input type="text" style="text-align: right;" class="form-control"
-                        [(ngModel)]="fileBrowserService.currentPageNumber" (change)="onInputChangePage()">
-                    <span class="input-group-text">/ {{ fileBrowserService.totalPageNumber }}</span>
-                </div>
-            </div>
-    
-            <div class="col-md-10 text-end">
-                <button class="btn btn-outline-secondary mx-2"
-                    [ngClass]="{ 'invisible': fileBrowserService.currentPageNumber === 1 }"
-                    (click)="onClickChangePage(false)">Previous Page</button>
-                <button class="btn btn-outline-secondary mx-2"
-                    [ngClass]="{ 'invisible': fileBrowserService.currentPageNumber === fileBrowserService.totalPageNumber}"
-                    (click)="onClickChangePage(true)">Next Page</button>
+<div class="container">
+    <div class="row">
+        <div class="col-md-2">
+            <div class="input-group">
+                <span class="input-group-text">Page</span>
+                <input type="text" style="text-align: right;" class="form-control"
+                    [(ngModel)]="fileBrowserService.currentPageNumber" (change)="onInputChangePage()">
+                <span class="input-group-text">/ {{ fileBrowserService.totalPageNumber }}</span>
             </div>
         </div>
+
+        <div class="col-md-10 text-end">
+            <button class="btn btn-outline-secondary mx-2"
+                [ngClass]="{ 'invisible': fileBrowserService.currentPageNumber === 1 }"
+                (click)="onClickChangePage(-1)">Previous Page</button>
+            <button class="btn btn-outline-secondary mx-2"
+                [ngClass]="{ 'invisible': fileBrowserService.currentPageNumber === fileBrowserService.totalPageNumber}"
+                (click)="onClickChangePage(1)">Next Page</button>
+        </div>
     </div>
-    }
+</div>
+}

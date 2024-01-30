@@ -1,60 +1,62 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { SettingsPackage } from '../packages/settings-package';
-import { FileTagsPackage } from '../packages/file-tags-package';
+import { URLsManager } from '../managers/urls.manager';
+import { SavingPackage } from '../models/packages/saving.package';
+import { TagsPackage } from '../models/packages/tags.package';
+import { SettingsPackage } from '../models/packages/settings.package';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CommunicationService {
 
-  // Server data
-  private readonly SERVER_URL: string = 'http://localhost:8080';
-  private readonly OPEN_DESKTOP_FILE_URL: string = '/openDesktopFile';
-  private readonly DELETE_DESKTOP_FILE_URL: string = '/deleteDesktopFile';
-  private readonly GET_DESKTOP_FILE_PACKAGE_URL: string = '/getDesktopFilePackage';
-  private readonly GET_DESKTOP_FILE_URL: string = '/getDesktopFile';
-  private readonly MODIFY_DESKTOP_FILE_URL: String = "/modifyDesktopFile";
-  private readonly LOAD_SAVING_URL: String = "/loadSaving";
-  private readonly SAVE_SETTINGS_URL: String = "/saveSettings";
-  private readonly SAVE_FILE_TAGS_URL: String = "/saveFileTags";
-
   // Injection
   constructor(private httpClient: HttpClient) { }
+
+  // // Http load the saving
+  httpLoadSaving(): Observable<SavingPackage> {
+    return this.httpClient.get<SavingPackage>(
+      URLsManager.SERVER_URL + URLsManager.LOAD_SAVING_URL
+    );
+  }
+
+  // Http save the settings
+  httpSaveSettings(settingsPackage?: SettingsPackage): Observable<SettingsPackage> {
+    return this.httpClient.post<SettingsPackage>(
+      URLsManager.SERVER_URL + URLsManager.SAVE_SETTINGS_URL,
+      settingsPackage
+    );
+  }
+
+  // Http save the tags
+  httpSaveTags(tagsPackage?: TagsPackage): Observable<TagsPackage> {
+    return this.httpClient.post<TagsPackage>(
+      URLsManager.SERVER_URL + URLsManager.SAVE_TAGS_URL,
+      tagsPackage
+    );
+  }
+
+  // Http get desktop files
+  httpGetDesktopFiles(currentFolderPath: string, allLevels: boolean): Observable<Object> {
+    return this.httpClient.get(
+      URLsManager.SERVER_URL + URLsManager.GET_DESKTOP_FILES_URL,
+      {
+        params: {
+          'path': currentFolderPath,
+          'all': allLevels,
+        }
+      }
+    );
+  }
 
   // Http open a desktop file
   httpOpenDesktopFile(desktopFilePath: string): Observable<Object> {
     return this.httpClient.get(
-      this.SERVER_URL + this.OPEN_DESKTOP_FILE_URL,
+      URLsManager.SERVER_URL + URLsManager.OPEN_DESKTOP_FILE_URL,
       {
         params: {
           'path': desktopFilePath
-        }
-      }
-    );
-  }
-
-  // Http delete a desktop file
-  httpDeleteDesktopFile(desktopFilePath: string): Observable<Object> {
-    return this.httpClient.get(
-      this.SERVER_URL + this.DELETE_DESKTOP_FILE_URL,
-      {
-        params: {
-          'path': desktopFilePath
-        }
-      }
-    );
-  }
-
-  // Http get a desktop file package
-  httpGetDesktopFilePackage(currentFolderPath: string, allFiles: boolean): Observable<Object> {
-    return this.httpClient.get(
-      this.SERVER_URL + this.GET_DESKTOP_FILE_PACKAGE_URL,
-      {
-        params: {
-          'path': currentFolderPath,
-          'all': allFiles,
         }
       }
     );
@@ -63,7 +65,7 @@ export class CommunicationService {
   // Http get a desktop file
   httpGetDesktopFile(desktopFilePath: string): Observable<Object> {
     return this.httpClient.get(
-      this.SERVER_URL + this.GET_DESKTOP_FILE_URL,
+      URLsManager.SERVER_URL + URLsManager.GET_DESKTOP_FILE_URL,
       {
         params: {
           'path': desktopFilePath
@@ -73,38 +75,15 @@ export class CommunicationService {
   }
 
   // Http modify a desktop file
-  httpModifyDesktopFile(desktopFilePath: string, tags: string[]): Observable<Object> {
-    return this.httpClient.get(
-      this.SERVER_URL + this.MODIFY_DESKTOP_FILE_URL,
+  httpModifyDesktopFile(desktopFilePath: string, tagsPackage: TagsPackage): Observable<Object> {
+    return this.httpClient.post(
+      URLsManager.SERVER_URL + URLsManager.MODIFY_DESKTOP_FILE_TAGS_URL,
+      tagsPackage,
       {
         params: {
           'path': desktopFilePath,
-          'tags': tags
         }
       }
-    );
-  }
-
-  // Http load the saving
-  httpLoadSaving(): Observable<Object> {
-    return this.httpClient.get(
-      this.SERVER_URL + this.LOAD_SAVING_URL
-    );
-  }
-
-  // Http save the settings
-  httpSaveSettings(settingsPackage?: SettingsPackage): Observable<Object> {
-    return this.httpClient.post<SettingsPackage>(
-      this.SERVER_URL + this.SAVE_SETTINGS_URL,
-      settingsPackage
-    );
-  }
-
-  // Http save the file tags
-  httpSaveFileTags(fileTagsPackage?: FileTagsPackage): Observable<Object> {
-    return this.httpClient.post<FileTagsPackage>(
-      this.SERVER_URL + this.SAVE_FILE_TAGS_URL,
-      fileTagsPackage
     );
   }
 }

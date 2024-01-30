@@ -1,8 +1,8 @@
 <div class="form-group mb-3">
     <label class="h6" for="currentFolderPath">Current Folder</label>
     <div class="input-group mb-2">
-        <input type="text" class="form-control" id="currentFolderPath" [(ngModel)]="fileBrowserService.currentFolderPath"
-            (change)="onChangeCurrentFolderPath()">
+        <input type="text" class="form-control" id="currentFolderPath"
+            [(ngModel)]="fileBrowserService.currentFolderPath" (change)="onChangeCurrentFolderPath()">
         <button class="btn btn-outline-secondary" type="button" (click)="onClickParentButton()" title="Parent Folder">
             <i class="bi bi-arrow-90deg-left"></i>
         </button>
@@ -15,13 +15,13 @@
     </div>
 
     <div class="btn-group" role="group">
-        <button class="btn btn-success" (click)="onClickFileOptionButton(false)" [disabled]="!fileBrowserService.allFiles"
-            title="Show folders and files within the current folder">
-            This Folder
+        <button class="btn btn-success" (click)="onClickLevelButton()" [disabled]="!fileBrowserService.allLevels"
+            title="One level under the current folder">
+            One Level
         </button>
-        <button class="btn btn-success" (click)="onClickFileOptionButton(true)" [disabled]="fileBrowserService.allFiles"
-            title="Show all files inside the current folder">
-            All Files
+        <button class="btn btn-success" (click)="onClickLevelButton()" [disabled]="fileBrowserService.allLevels"
+            title="All levels under the current folder">
+            All Levels
         </button>
     </div>
 </div>

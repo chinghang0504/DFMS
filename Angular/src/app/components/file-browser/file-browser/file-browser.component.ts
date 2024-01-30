@@ -1,11 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { LoadingService } from '../../../services/loading.service';
 import { FileBrowserService } from '../../../services/file-browser.service';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { SettingsService } from '../../../services/settings.service';
-import { Subscription } from 'rxjs';
-import { CommunicationService } from '../../../services/communication.service';
-import { DesktopFilesPackage } from '../../../packages/desktop-file-package';
-import { ErrorPackage } from '../../../packages/error-package';
+import { Subscription, take } from 'rxjs';
 
 @Component({
   selector: 'app-file-browser',
@@ -14,28 +12,25 @@ import { ErrorPackage } from '../../../packages/error-package';
 })
 export class FileBrowserComponent implements OnInit, OnDestroy {
 
-  // Internal data
+  // Private data
   private _subscription: Subscription;
 
   // Injection
   constructor(
-    public fileBrowserService: FileBrowserService,
-    private settingsService: SettingsService, private communicationService: CommunicationService,
+    public loadingService: LoadingService,
+    private fileBrowserService: FileBrowserService, private settingsService: SettingsService,
     private activatedRoute: ActivatedRoute, private router: Router
   ) { }
 
   // On init
   ngOnInit() {
-    this.activatedRoute.queryParams.subscribe(
-      (queryParams) => {
-        const queryParamsPath: string = queryParams['path'];
-
-        if (queryParamsPath) {
-          this.fileBrowserService.currentFolderPath = queryParamsPath;
-          this.fileBrowserService.allFiles = false;
-          this.getDesktopFilePackage();
-        } else {
-          this.fileBrowserService.currentFolderPath ? this.navigateCurrentFolder() : this.navigateHomeFolder();
+    this._subscription = this.loadingService.succeededSubject
+      .pipe(
+        take(1)
+      )
+      .subscribe({
+        complete: () => {
+          this.subscribeQueryParams();
         }
       });
   }
@@ -43,6 +38,22 @@ export class FileBrowserComponent implements OnInit, OnDestroy {
   // On destroy
   ngOnDestroy() {
     this._subscription?.unsubscribe();
+  }
+
+  // Subscribe the query params
+  private subscribeQueryParams() {
+    this.activatedRoute.queryParams.subscribe(
+      (params: Params) => {
+        const paramsPath: string = params['path'];
+
+        if (paramsPath) {
+          this.fileBrowserService.currentFolderPath = paramsPath;
+          this.fileBrowserService.allLevels = false;
+          this.fileBrowserService.getDesktopFiles();
+        } else {
+          this.fileBrowserService.currentFolderPath ? this.navigateCurrentFolder() : this.navigateHomeFolder();
+        }
+      });
   }
 
   // Navigate the path
@@ -61,7 +72,7 @@ export class FileBrowserComponent implements OnInit, OnDestroy {
 
   // Navigate the home folder
   navigateHomeFolder() {
-    this.navigate(this.settingsService.homeFolderPath);
+    this.navigate(this.settingsService.originalSettingsPackage.homeFolderPath);
   }
 
   // Navigate the file details
@@ -71,29 +82,5 @@ export class FileBrowserComponent implements OnInit, OnDestroy {
         'path': path
       }
     });
-  }
-
-  // Get a desktop file package
-  getDesktopFilePackage() {
-    this._subscription?.unsubscribe();
-
-    this.fileBrowserService.loading = true;
-    this.fileBrowserService.errorMessage = '';
-    this.fileBrowserService.terminateWorker();
-
-    this._subscription = this.communicationService.httpGetDesktopFilePackage(this.fileBrowserService.currentFolderPath, this.fileBrowserService.allFiles)
-      .subscribe(
-        (res: DesktopFilesPackage) => {
-          this.fileBrowserService.updateDesktopFiles(res);
-        }, (err) => {
-          if (err['status'] === 400) {
-            this.fileBrowserService.errorMessage = (<ErrorPackage>err['error']).message;
-          } else {
-            this.fileBrowserService.errorMessage = 'Unable to connect to the desktop. Please make sure that the DFMS.exe is open.';
-          }
-
-          this.fileBrowserService.loading = false;
-        }
-      );
   }
 }

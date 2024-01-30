@@ -1,12 +1,13 @@
 {
   "Settings": {
-    "HomeFolderPath": "C:\\",
-    "ShowHidden": false,
-    "RemoveDoubleConfirmation": true
+    "home_folder_path": "C:\\Users\\Ching Hang\\Desktop",
+    "show_hidden": false,
+    "tag_removal_double_confirmation": true
   },
-  "FileTags": {
-    "Tags": [
-      "CS"
+  "Tags": {
+    "tags": [
+      "CS",
+      "Java"
     ]
   }
 }

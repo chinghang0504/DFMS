@@ -1,7 +1,11 @@
 <h3 class="my-3">File Browser</h3>
 
+<app-loading></app-loading>
+
+@if (loadingService.isRunning) {
 <app-file-browser-current-folder [parent]="this"></app-file-browser-current-folder>
 
-<app-file-browser-searching></app-file-browser-searching>
+<app-file-browser-filter></app-file-browser-filter>
 
 <app-file-browser-table [parent]="this"></app-file-browser-table>
+}

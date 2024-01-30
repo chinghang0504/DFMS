@@ -3,8 +3,9 @@ import { FileBrowserComponent } from '../file-browser/file-browser.component';
 import { FileBrowserService } from '../../../services/file-browser.service';
 import { CommunicationService } from '../../../services/communication.service';
 import { ModalService } from '../../../services/modal.service';
-import { DesktopFile } from '../../../models/desktop-file';
-import { ErrorPackage } from '../../../packages/error-package';
+import { DesktopFile } from '../../../models/desktop-file.model';
+import { ErrorManager } from '../../../managers/error.manager';
+import { LoadingService } from '../../../services/loading.service';
 
 @Component({
   selector: 'app-file-browser-table',
@@ -19,7 +20,7 @@ export class FileBrowserTableComponent {
   // Injection
   constructor(
     public fileBrowserService: FileBrowserService,
-    private communicationService: CommunicationService, private modalService: ModalService
+    private communicationService: CommunicationService, private modalService: ModalService, private loadingService: LoadingService
   ) { }
 
   // On click the table header
@@ -38,42 +39,12 @@ export class FileBrowserTableComponent {
   // On click the open file button
   onClickOpenFileButton(desktopFilePath: string) {
     this.communicationService.httpOpenDesktopFile(desktopFilePath)
-      .subscribe(
-        (res) => { },
-        (err) => {
-          if (err['status'] === 400) {
-            this.modalService.executeOneButtonModal(
-              'Error', (<ErrorPackage>err['error']).message, 'OK'
-            );
-          } else {
-            this.fileBrowserService.errorMessage = 'Unable to connect to the desktop. Please make sure that the DFMS.exe is open.';
-          }
+      .subscribe({
+        next: () => { },
+        error: (err: any) => {
+          ErrorManager.handleError(err, this.modalService, this.loadingService);
         }
-      );
-  }
-
-  // On click delete file button
-  onClickDeleteFileButton(desktopFile: DesktopFile) {
-    this.modalService.executeTwoButtonModal(
-      'Delete Confirmation', `Do you want to delete this file ${desktopFile.name}?`, 'Delete', 'Cancel',
-      () => {
-        this.communicationService.httpDeleteDesktopFile(desktopFile.absolutePath)
-          .subscribe(
-            (res) => {
-              this.parent.getDesktopFilePackage();
-            },
-            (err) => {
-              if (err['status'] === 400) {
-                this.modalService.executeOneButtonModal(
-                  'Error', (<ErrorPackage>err['error']).message, 'OK'
-                );
-              } else {
-                this.fileBrowserService.errorMessage = 'Unable to connect to the desktop. Please make sure that the DFMS.exe is open.';
-              }
-            }
-          );
-      }
-    );
+      });
   }
 
   // On click the file details button

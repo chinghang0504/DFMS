@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { DesktopFile } from '../../../models/desktop-file';
+import { DesktopFile } from '../../../models/desktop-file.model';
 
 @Component({
   selector: 'app-file-details-table',

@@ -1,5 +1,6 @@
 package com.example.spring
 
+import com.example.spring.managers.URLsManager.Companion.SERVER_URL
 import com.example.spring.user_interfaces.UserInterface
 import org.springframework.boot.ApplicationRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
@@ -8,6 +9,9 @@ import org.springframework.context.annotation.Bean
 import java.awt.Desktop
 import java.net.URI
 
+private const val openBrowser: Boolean = true
+private const val showUI: Boolean = true
+
 @SpringBootApplication
 class Application {
 
@@ -15,19 +19,22 @@ class Application {
     fun applicationRunner(): ApplicationRunner {
         return ApplicationRunner {
             // Open the browser
-            Desktop.getDesktop().browse(URI("http://localhost:8080/"))
+            if (openBrowser) {
+                Desktop.getDesktop().browse(URI(SERVER_URL))
+            }
         }
     }
 
     companion object {
-
         @JvmStatic
         fun main(args: Array<String>) {
             // Start a Spring
             SpringApplicationBuilder(Application::class.java).headless(false).run(*args)
 
             // Start a UI
-            UserInterface()
+            if (showUI) {
+                UserInterface()
+            }
         }
     }
 }

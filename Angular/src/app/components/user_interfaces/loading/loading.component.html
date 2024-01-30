@@ -1,0 +1,21 @@
+@if (loadingService.isLoading) {
+<div class="position-absolute top-50 start-50 translate-middle">
+    <div class="d-flex flex-column justify-content-center align-items-center">
+        <div class="spinner-grow text-dark" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p>Loading...</p>
+    </div>
+</div>
+}
+@else if (!loadingService.isRunning) {
+<div class="alert alert-danger d-flex align-items-center fade show">
+    <i class="bi-exclamation-octagon-fill"></i>
+    <strong class="mx-2">Connection Failed!</strong>Unable to connect to the server. Please make sure that DFMS.exe is
+    open.
+</div>
+<button class="btn btn-outline-primary" (click)="onClickReconnectButton()">
+    Reconnect
+    <i class="bi bi-arrow-clockwise"></i>
+</button>
+}

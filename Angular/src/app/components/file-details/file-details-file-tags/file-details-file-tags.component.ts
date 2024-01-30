@@ -1,13 +1,14 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ModalService } from '../../../services/modal.service';
 import { CommunicationService } from '../../../services/communication.service';
-import { ErrorPackage } from '../../../packages/error-package';
-import { FileTagsService } from '../../../services/file-tags.service';
+import { ErrorPackage } from '../../../models/packages/error.package';
 import { FileDetailsComponent } from '../file-details/file-details.component';
-import { DesktopFile } from '../../../models/desktop-file';
+import { DesktopFile } from '../../../models/desktop-file.model';
 import { finalize } from 'rxjs';
 import { SettingsService } from '../../../services/settings.service';
-import { FileTag } from '../../../models/file-tag';
+import { TagsService } from '../../../services/tags.service';
+import { FileTag } from '../../../models/file-tag.model';
+import { TagsPackage } from '../../../models/packages/tags.package';
 
 @Component({
   selector: 'app-file-details-file-tags',
@@ -23,7 +24,7 @@ export class FileDetailsFileTagsComponent implements OnInit {
 
   // Injection
   constructor(
-    public fileTagsService: FileTagsService,
+    public tagsService: TagsService,
     private settingsService: SettingsService, private communicationService: CommunicationService, private modalService: ModalService
   ) { }
 
@@ -35,9 +36,9 @@ export class FileDetailsFileTagsComponent implements OnInit {
   // Update the available tags
   private updateAvailableTags() {
     this.availableTags = [];
-    this.fileTagsService.fileTags.forEach((fileTag: FileTag) => {
-      if (!this.desktopFile.tags.includes(fileTag.name)) {
-        this.availableTags.push(fileTag.name);
+    this.tagsService.fileTags.forEach((fileTag: FileTag) => {
+      if (!this.desktopFile.tags.includes(fileTag.tag)) {
+        this.availableTags.push(fileTag.tag);
       }
     });
   }
@@ -59,7 +60,7 @@ export class FileDetailsFileTagsComponent implements OnInit {
       this.saveChanges();
     };
 
-    if (this.settingsService.removeDoubleConfirmation) {
+    if (this.settingsService.originalSettingsPackage.tagRemovalDoubleConfirmation) {
       this.modalService.executeTwoButtonModal(
         'Remove Confirmation', `Do you want to remove ${this.desktopFile.tags[index]} from this file?`, 'Remove', 'Cancel',
         () => {
@@ -74,7 +75,8 @@ export class FileDetailsFileTagsComponent implements OnInit {
 
   // Save changes
   private saveChanges() {
-    this.communicationService.httpModifyDesktopFile(this.desktopFile.absolutePath, this.desktopFile.tags)
+    const tagsPackage: TagsPackage = { tags: this.desktopFile.tags };
+    this.communicationService.httpModifyDesktopFile(this.desktopFile.absolutePath, tagsPackage)
       .pipe(finalize(() => {
         this.parent.updateData();
         this.updateAvailableTags();

@@ -2,16 +2,7 @@
 <div class="container">
     <div class="row">
         <div class="col-md-12">
-            @if (loading) {
-            <p>Loading ...</p>
-            } @else if (errorMessage) {
-            <div class="alert alert-danger d-flex align-items-center fade show">
-                <i class="bi-exclamation-octagon-fill"></i>
-                <strong class="mx-2">Error!</strong>{{ errorMessage }}
-            </div>
-            } @else {
             <router-outlet></router-outlet>
-            }
         </div>
     </div>
 </div>

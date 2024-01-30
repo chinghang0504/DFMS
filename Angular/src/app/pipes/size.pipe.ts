@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { DesktopFile } from '../models/desktop-file';
+import { DesktopFile } from '../models/desktop-file.model';
 
 @Pipe({
   name: 'size'

@@ -1,98 +1,101 @@
 package com.example.spring.controllers
 
+import com.example.spring.managers.KeysManager.Companion.SAVING_FILENAME
 import com.example.spring.managers.ResponseEntityManager
+import com.example.spring.managers.URLsManager.Companion.DEVELOPMENT_URL
+import com.example.spring.managers.URLsManager.Companion.LOAD_SAVING_URL
+import com.example.spring.managers.URLsManager.Companion.SAVE_SETTINGS_URL
+import com.example.spring.managers.URLsManager.Companion.SAVE_TAGS_URL
 import com.example.spring.models.*
-import com.example.spring.packages.FileTagsPackage
-import com.example.spring.packages.SavingPackage
-import com.example.spring.packages.SettingsPackage
+import com.example.spring.models.packages.CommunicationPackage
+import com.example.spring.models.packages.TagsPackage
+import com.example.spring.models.packages.SavingPackage
+import com.example.spring.models.packages.SettingsPackage
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.io.File
-import java.util.concurrent.locks.ReentrantLock
-import kotlin.concurrent.withLock
+import java.util.concurrent.locks.ReentrantReadWriteLock
+import kotlin.concurrent.read
+import kotlin.concurrent.write
 
-private const val LOAD_SAVING_URL: String = "/loadSaving"
-private const val SAVE_SETTINGS_URL: String = "/saveSettings"
-private const val SAVE_FILE_TAGS_URL: String = "/saveFileTags"
-
-private const val SAVING_FILE_NAME: String = "saving.json"
-
-private val DEFAULT_SAVING_PACKAGE: SavingPackage = SavingPackage(SettingsPackage.getDefault(), FileTagsPackage.getDefault())
-
-@CrossOrigin("http://localhost:4200")
+@CrossOrigin(DEVELOPMENT_URL)
 @RestController
 class SavingRestController {
 
-    private var savingPackage: SavingPackage
-    private val lock: ReentrantLock = ReentrantLock()
+    private lateinit var savingPackage: SavingPackage
+    private val reentrantReadWriteLock: ReentrantReadWriteLock = ReentrantReadWriteLock()
 
     // Constructor
-    constructor() {
-        val file: File = File(SAVING_FILE_NAME)
-        lock.withLock {
+    private constructor() {
+        initSavingPackage(File(SAVING_FILENAME))
+    }
+
+    // Initialize the saving package
+    private fun initSavingPackage(file: File) {
+        reentrantReadWriteLock.write {
             savingPackage = try {
                 if (file.exists()) {
                     Gson().fromJson(file.readText(), SavingPackage::class.java)
                 } else {
-                    DEFAULT_SAVING_PACKAGE
+                    SavingPackage()
                 }
             } catch (e: Exception) {
-                DEFAULT_SAVING_PACKAGE
+                SavingPackage()
             }
         }
     }
 
     // Http load the saving
     @GetMapping(LOAD_SAVING_URL)
-    fun httpLoadSaving(): ResponseEntity<*> {
-        return ResponseEntityManager.get(lock.withLock { savingPackage })
+    fun httpLoadSaving(): ResponseEntity<SavingPackage> {
+        return ResponseEntityManager.get(reentrantReadWriteLock.read { savingPackage })
     }
 
     // Http save the settings
     @PostMapping(SAVE_SETTINGS_URL)
-    fun httpSaveSettings(@RequestBody settingsPackage: SettingsPackage?): ResponseEntity<*> {
+    fun httpSaveSettings(@RequestBody settingsPackage: SettingsPackage?): ResponseEntity<out CommunicationPackage> {
+        val file: File = File(SAVING_FILENAME)
+        val gson: Gson = GsonBuilder().setPrettyPrinting().create()
+        val newSettingsPackage: SettingsPackage = settingsPackage ?: SettingsPackage()
+
         return try {
-            val file: File = File(SAVING_FILE_NAME)
-            val newSettingsPackage: SettingsPackage = settingsPackage ?: SettingsPackage.getDefault()
-            val gson: Gson = GsonBuilder().setPrettyPrinting().create()
-            lock.withLock {
-                val savingPackage: SavingPackage = this.savingPackage.copy(settingsPackage = newSettingsPackage)
-                file.writeText(gson.toJson(savingPackage))
-                this.savingPackage = savingPackage
+            reentrantReadWriteLock.write {
+                val newSavingPackage: SavingPackage = this.savingPackage.copy(settingsPackage = newSettingsPackage)
+                file.writeText(gson.toJson(newSavingPackage))
+                this.savingPackage = newSavingPackage
             }
             ResponseEntityManager.get(newSettingsPackage)
         } catch (e: Exception) {
-            val errorStatus: ErrorStatus = if (settingsPackage != null) {
-                ErrorStatus.UNABLE_TO_SAVE_SETTINGS
+            if (settingsPackage != null) {
+                ResponseEntityManager.get(ErrorStatus.UNABLE_TO_SAVE_SETTINGS)
             } else {
-                ErrorStatus.UNABLE_TO_RESET_SETTINGS
+                ResponseEntityManager.get(ErrorStatus.UNABLE_TO_RESET_SETTINGS)
             }
-            ResponseEntityManager.get(errorStatus)
         }
     }
 
-    // Http save the file tags
-    @PostMapping(SAVE_FILE_TAGS_URL)
-    fun httpSaveFileTags(@RequestBody fileTagsPackage: FileTagsPackage?): ResponseEntity<*> {
+    // Http save the tags
+    @PostMapping(SAVE_TAGS_URL)
+    fun httpSaveTags(@RequestBody tagsPackage: TagsPackage?): ResponseEntity<out CommunicationPackage> {
+        val file: File = File(SAVING_FILENAME)
+        val gson: Gson = GsonBuilder().setPrettyPrinting().create()
+        val newTagsPackage: TagsPackage = tagsPackage ?: TagsPackage()
+
         return try {
-            val file: File = File(SAVING_FILE_NAME)
-            val newFileTagsPackage: FileTagsPackage = fileTagsPackage ?: FileTagsPackage.getDefault()
-            val gson: Gson = GsonBuilder().setPrettyPrinting().create()
-            lock.withLock {
-                val savingPackage: SavingPackage = this.savingPackage.copy(fileTagsPackage = newFileTagsPackage)
-                file.writeText(gson.toJson(savingPackage))
-                this.savingPackage = savingPackage
+            reentrantReadWriteLock.write {
+                val newSavingPackage: SavingPackage = this.savingPackage.copy(tagsPackage = newTagsPackage)
+                file.writeText(gson.toJson(newSavingPackage))
+                this.savingPackage = newSavingPackage
             }
-            ResponseEntityManager.get(newFileTagsPackage)
+            ResponseEntityManager.get()
         } catch (e: Exception) {
-            val errorStatus: ErrorStatus = if (fileTagsPackage != null) {
-                ErrorStatus.UNABLE_TO_SAVE_FILE_TAGS
+            if (tagsPackage != null) {
+                ResponseEntityManager.get(ErrorStatus.UNABLE_TO_SAVE_TAGS)
             } else {
-                ErrorStatus.UNABLE_TO_CLEAR_ALL_FILE_TAGS
+                ResponseEntityManager.get(ErrorStatus.UNABLE_TO_CLEAR_ALL_TAGS)
             }
-            ResponseEntityManager.get(errorStatus)
         }
     }
 }

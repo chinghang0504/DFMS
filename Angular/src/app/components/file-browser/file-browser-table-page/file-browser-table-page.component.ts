@@ -17,7 +17,7 @@ export class FileBrowserTablePageComponent {
   }
 
   // On click change the page
-  onClickChangePage(next: boolean) {
-    this.fileBrowserService.updatePage(next);
+  onClickChangePage(changeNumber: number) {
+    this.fileBrowserService.updatePage(changeNumber);
   }
 }

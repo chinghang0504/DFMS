@@ -1,0 +1,10 @@
+{
+  "Settings": {
+    "HomeFolderPath": "C:\\test\\test",
+    "ShowHidden": true,
+    "RemoveDoubleConfirmation": false
+  },
+  "FileTags": {
+    "Tags": ["CS"]
+  }
+}

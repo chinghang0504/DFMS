@@ -1,27 +1,25 @@
 <div class="my-3">
-    <button class="btn btn-outline-secondary me-3"
-        (click)="onClickBackButton()">
+    <button class="btn btn-outline-secondary me-3" (click)="onClickBackButton()">
         <i class="bi bi-arrow-90deg-left"></i>
     </button>
     <h3 class="d-inline align-middle">File Details</h3>
-    <button class="btn btn-outline-secondary float-end"
-        [ngClass]="{ 'invisible': !desktopFile }"
-        (click)="onClickUpdateButton()">
+    <button class="btn btn-outline-secondary float-end" (click)="onClickUpdateButton()">
         <i class="bi bi-arrow-clockwise"></i>
     </button>
 </div>
 
-@if (loading) {
-<div class="mb-3">
-    <p>loading ...</p>
-</div>
-} @else if (errorMessage) {
-<div class="alert alert-danger d-flex align-items-center fade show mb-3">
+<app-loading></app-loading>
+
+@if (loadingService.isRunning) {
+
+@if (errorMessage) {
+<div class="alert alert-danger d-flex align-items-center fade show">
     <i class="bi-exclamation-octagon-fill"></i>
-    <strong class="mx-2">Error!</strong>{{ errorMessage }}
+    <strong class="mx-2">Connection Failed!</strong>{{ errorMessage }}
 </div>
-} @else {
+} @else if (desktopFile) {
 <app-file-details-table [desktopFile]="desktopFile"></app-file-details-table>
 
 <app-file-details-file-tags [parent]="this" [desktopFile]="desktopFile"></app-file-details-file-tags>
+}
 }

@@ -1,19 +1,30 @@
 import { Injectable } from '@angular/core';
-import { SortingMode } from '../models/sorting-mode';
-import { DesktopFile } from '../models/desktop-file';
-import { DesktopFilesPackage } from '../packages/desktop-file-package';
+import { DesktopFile } from '../models/desktop-file.model';
+import { SortingMode } from '../models/sorting-mode.model';
+import { Subscription } from 'rxjs';
+import { LoadingService } from './loading.service';
+import { CommunicationService } from './communication.service';
+import { DesktopFilesPackage } from '../models/packages/desktop-files.package';
+import { ModalService } from './modal.service';
+import { ErrorManager } from '../managers/error.manager';
+import { FileTag } from '../models/file-tag.model';
 import { SettingsService } from './settings.service';
-import { FileTagsService } from './file-tags.service';
-import { FileTag } from '../models/file-tag';
+import { TagsService } from './tags.service';
 
 interface WorkerData {
-  folderList: DesktopFile[],
-  fileList: DesktopFile[],
-  showHidden: boolean,
-  enableSearching: boolean,
-  searchingName: string,
-  sortingMode: SortingMode,
+
+  folderList: DesktopFile[];
+  fileList: DesktopFile[];
+
+  showHidden: boolean;
+
+  enableFilter: boolean;
+  filterFileName: string;
+  fileterIsFile: boolean;
+  fileterIsFolder: boolean;
   fileTags: FileTag[];
+
+  sortingMode: SortingMode;
 }
 
 @Injectable({
@@ -21,49 +32,68 @@ interface WorkerData {
 })
 export class FileBrowserService {
 
-  // UI data
-  // File current folder
+  // Public data
+  // Current folder
   currentFolderPath: string = '';
-  allFiles: boolean = false;
+  allLevels: boolean = false;
 
-  // File searching
-  enableSearching: boolean = false;
-  searchingName: string = '';
+  // Filter
+  enableFilter: boolean = false;
+  filterFileName: string = '';
+  fileterIsFile: boolean = true;
+  fileterIsFolder: boolean = true;
 
-  // File table
-  loading: boolean = true;
-  errorMessage: string = '';
-  desktopFiles1000: DesktopFile[] = [];
+  // Table
+  desktopFilesPortion: DesktopFile[] = [];
   sortingMode: SortingMode = SortingMode.NAME_ASCENDING;
 
-  // File table page
+  // Table page
   currentPageNumber: number = 1;
   totalPageNumber: number = 1;
 
-  // Internal data
+  // Private data
+  private _subscription: Subscription;
+  private _worker: Worker;
+  private _desktopFiles: DesktopFile[] = [];
   private _folderList: DesktopFile[] = [];
   private _fileList: DesktopFile[] = [];
-  private _desktopFiles: DesktopFile[] = [];
-  private _worker: Worker;
+
+  private readonly _desktopFilesPerPage: number = 100;
 
   // Injection
   constructor(
-    private settingsService: SettingsService, private fileTagsService: FileTagsService
-  ) { }
+    private loadingService: LoadingService, private communicationService: CommunicationService,
+    private modalService: ModalService, private settingsService: SettingsService, private tagsService: TagsService) { }
 
   // Getters
-  get size() {
+  get resultSize() {
     return this._desktopFiles.length;
   }
 
-  // Terminate worker
-  terminateWorker() {
+  // Get the desktop files
+  getDesktopFiles() {
+    this._subscription?.unsubscribe();
     this._worker?.terminate();
+
+    this.loadingService.isLoading = true;
+    
+    this._subscription = this.communicationService.httpGetDesktopFiles(this.currentFolderPath, this.allLevels)
+      .subscribe({
+        next: (value: DesktopFilesPackage) => {
+          this.updateDesktopFiles(value);
+        },
+        error: (err: any) => {
+          this.loadingService.isLoading = false;
+          ErrorManager.handleError(err, this.modalService, this.loadingService);
+        }
+      });
   }
 
   // Update the desktop files
   updateDesktopFiles(desktopFilePackage?: DesktopFilesPackage) {
-    this.terminateWorker();
+    this._worker?.terminate();
+
+    this.loadingService.isLoading = true;
 
     if (desktopFilePackage) {
       this._folderList = desktopFilePackage.folderList;
@@ -71,13 +101,18 @@ export class FileBrowserService {
     }
 
     const workerData: WorkerData = {
-      folderList: this._folderList,
       fileList: this._fileList,
-      showHidden: this.settingsService.showHidden,
-      enableSearching: this.enableSearching,
-      searchingName: this.searchingName,
-      sortingMode: this.sortingMode,
-      fileTags: this.fileTagsService.fileTags
+      folderList: this._folderList,
+
+      showHidden: this.settingsService.originalSettingsPackage.showHidden,
+
+      enableFilter: this.enableFilter,
+      filterFileName: this.filterFileName,
+      fileterIsFile: this.fileterIsFile,
+      fileterIsFolder: this.fileterIsFolder,
+      fileTags: this.tagsService.fileTags,
+
+      sortingMode: this.sortingMode 
     };
 
     // Worker
@@ -86,8 +121,10 @@ export class FileBrowserService {
 
       this._worker.onmessage = ({ data }) => {
         this._desktopFiles = data;
-        this.extract1000DesktopFiles();
-        this.loading = false;
+        this.extractDesktopFilesPortion();
+        if (this._subscription?.closed) {
+          this.loadingService.isLoading = false;
+        }
       };
 
       this._worker.postMessage(workerData);
@@ -95,8 +132,10 @@ export class FileBrowserService {
     // Non-worker
     else {
       this._desktopFiles = FileBrowserService.filterAndSortDesktopFiles(workerData);
-      this.extract1000DesktopFiles();
-      this.loading = false;
+      this.extractDesktopFilesPortion();
+      if (this._subscription?.closed) {
+        this.loadingService.isLoading = false;
+      }
     }
   }
 
@@ -120,15 +159,26 @@ export class FileBrowserService {
           return false;
         }
 
-        if (workderData.enableSearching) {
+        // Filter
+        if (workderData.enableFilter) {
+          // Is file
+          if (!workderData.fileterIsFile && !desktopFile.isFolder) {
+            return false;
+          }
+
+          // Is folder
+          if (!workderData.fileterIsFolder && desktopFile.isFolder) {
+            return false;
+          }
+
           // Name
-          if (workderData.searchingName && desktopFile.name.toLocaleLowerCase().indexOf(workderData.searchingName.toLocaleLowerCase()) === -1) {
+          if (workderData.filterFileName && desktopFile.name.toLocaleLowerCase().indexOf(workderData.filterFileName.toLocaleLowerCase()) === -1) {
             return false;
           }
 
           // Tags
           for (const fileTag of workderData.fileTags) {
-            if (fileTag.active && desktopFile.tags.indexOf(fileTag.name) === -1) {
+            if (fileTag.active && desktopFile.tags.indexOf(fileTag.tag) === -1) {
               return false;
             }
           }
@@ -171,30 +221,22 @@ export class FileBrowserService {
     }
   }
 
-  // Extract 1000 desktop files
-  extract1000DesktopFiles() {
+  // Extract desktop files portion
+  extractDesktopFilesPortion() {
     if (this._desktopFiles.length > 0) {
       this.currentPageNumber = 1;
-      this.totalPageNumber = Math.ceil(this._desktopFiles.length / 1000);
-      this.desktopFiles1000 = this._desktopFiles.slice(0, 1000);
+      this.totalPageNumber = Math.ceil(this._desktopFiles.length / this._desktopFilesPerPage);
+      this.desktopFilesPortion = this._desktopFiles.slice(0, this._desktopFilesPerPage);
     } else {
       this.currentPageNumber = 0;
       this.totalPageNumber = 0;
-      this.desktopFiles1000 = [];
+      this.desktopFilesPortion = [];
     }
   }
 
   // Update the page
-  updatePage(next?: boolean) {
-    let pageNumber: number;
-
-    if (next === undefined) {
-      pageNumber = this.currentPageNumber;
-    } else if (next) {
-      pageNumber = this.currentPageNumber + 1;
-    } else {
-      pageNumber = this.currentPageNumber - 1;
-    }
+  updatePage(changeNumber?: number) {
+    const pageNumber: number = changeNumber ? this.currentPageNumber + changeNumber : this.currentPageNumber;
 
     if (pageNumber < 1) {
       this.currentPageNumber = 1;
@@ -204,7 +246,7 @@ export class FileBrowserService {
       this.currentPageNumber = pageNumber;
     }
 
-    const endIndex: number = this.currentPageNumber * 1000;
-    this.desktopFiles1000 = this._desktopFiles.slice(endIndex - 1000, endIndex);
+    const endIndex: number = this.currentPageNumber * this._desktopFilesPerPage;
+    this.desktopFilesPortion = this._desktopFiles.slice(endIndex - this._desktopFilesPerPage, endIndex);
   }
 }

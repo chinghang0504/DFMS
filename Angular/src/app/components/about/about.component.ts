@@ -7,4 +7,7 @@ import { Component } from '@angular/core';
 })
 export class AboutComponent {
 
+  // Public data
+  version: string = '';
+  releaseDate: string = '';
 }
