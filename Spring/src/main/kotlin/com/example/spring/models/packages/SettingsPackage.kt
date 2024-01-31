@@ -4,16 +4,22 @@ import com.google.gson.annotations.SerializedName
 
 private const val DEFAULT_HOME_FOLDER_PATH: String = "C:\\"
 private const val DEFAULT_SHOW_HIDDEN: Boolean = false
+private const val DEFAULT_FILES_PER_PAGE: Int = 25
 private const val DEFAULT_TAG_REMOVAL_DOUBLE_CONFIRMATION: Boolean = true
 
 data class SettingsPackage(
 
+    // File Browser Settings
     @SerializedName("home_folder_path")
-    var homeFolderPath: String = DEFAULT_HOME_FOLDER_PATH,
+    val homeFolderPath: String = DEFAULT_HOME_FOLDER_PATH,
+    @SerializedName("files_per_page")
+    val filesPerPage: Int = DEFAULT_FILES_PER_PAGE,
 
+    // File Settings
     @SerializedName("show_hidden")
-    var showHidden: Boolean = DEFAULT_SHOW_HIDDEN,
+    val showHidden: Boolean = DEFAULT_SHOW_HIDDEN,
 
+    // Tag Settings
     @SerializedName("tag_removal_double_confirmation")
-    var tagRemovalDoubleConfirmation: Boolean = DEFAULT_TAG_REMOVAL_DOUBLE_CONFIRMATION
+    val tagRemovalDoubleConfirmation: Boolean = DEFAULT_TAG_REMOVAL_DOUBLE_CONFIRMATION
 ): CommunicationPackage()

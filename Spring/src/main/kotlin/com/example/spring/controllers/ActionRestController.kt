@@ -9,6 +9,7 @@ import com.example.spring.models.packages.CommunicationPackage
 import org.apache.tomcat.util.http.fileupload.FileUtils
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.CrossOrigin
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
@@ -42,7 +43,7 @@ class ActionRestController {
     }
 
     // http delete a desktop file
-    @GetMapping(DELETE_DESKTOP_FILE_URL)
+    @DeleteMapping(DELETE_DESKTOP_FILE_URL)
     fun httpDeleteDesktopFile(@RequestParam path: String): ResponseEntity<out CommunicationPackage> {
         val file: File = File(path)
 

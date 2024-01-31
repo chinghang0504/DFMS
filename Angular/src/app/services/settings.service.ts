@@ -51,6 +51,8 @@ export class SettingsService {
         error: (err: any) => {
           this.settingsPackage = { ...this._originalSettingsPackage };
 
+          console.log(err);
+
           ErrorManager.handleError(err, this.modalService, this.loadingService);
         }
       });

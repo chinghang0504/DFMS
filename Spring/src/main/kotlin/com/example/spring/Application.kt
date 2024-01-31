@@ -9,8 +9,7 @@ import org.springframework.context.annotation.Bean
 import java.awt.Desktop
 import java.net.URI
 
-private const val openBrowser: Boolean = true
-private const val showUI: Boolean = true
+private const val developerMode: Boolean = false
 
 @SpringBootApplication
 class Application {
@@ -19,7 +18,7 @@ class Application {
     fun applicationRunner(): ApplicationRunner {
         return ApplicationRunner {
             // Open the browser
-            if (openBrowser) {
+            if (!developerMode) {
                 Desktop.getDesktop().browse(URI(SERVER_URL))
             }
         }
@@ -32,7 +31,7 @@ class Application {
             SpringApplicationBuilder(Application::class.java).headless(false).run(*args)
 
             // Start a UI
-            if (showUI) {
+            if (!developerMode) {
                 UserInterface()
             }
         }

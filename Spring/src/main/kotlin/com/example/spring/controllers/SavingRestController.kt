@@ -27,8 +27,8 @@ class SavingRestController {
     private lateinit var savingPackage: SavingPackage
     private val reentrantReadWriteLock: ReentrantReadWriteLock = ReentrantReadWriteLock()
 
-    // Constructor
-    private constructor() {
+    // Init
+    init {
         initSavingPackage(File(SAVING_FILENAME))
     }
 
@@ -54,7 +54,7 @@ class SavingRestController {
     }
 
     // Http save the settings
-    @PostMapping(SAVE_SETTINGS_URL)
+    @PatchMapping(SAVE_SETTINGS_URL)
     fun httpSaveSettings(@RequestBody settingsPackage: SettingsPackage?): ResponseEntity<out CommunicationPackage> {
         val file: File = File(SAVING_FILENAME)
         val gson: Gson = GsonBuilder().setPrettyPrinting().create()
@@ -77,7 +77,7 @@ class SavingRestController {
     }
 
     // Http save the tags
-    @PostMapping(SAVE_TAGS_URL)
+    @PatchMapping(SAVE_TAGS_URL)
     fun httpSaveTags(@RequestBody tagsPackage: TagsPackage?): ResponseEntity<out CommunicationPackage> {
         val file: File = File(SAVING_FILENAME)
         val gson: Gson = GsonBuilder().setPrettyPrinting().create()
@@ -89,7 +89,7 @@ class SavingRestController {
                 file.writeText(gson.toJson(newSavingPackage))
                 this.savingPackage = newSavingPackage
             }
-            ResponseEntityManager.get()
+            ResponseEntityManager.get(newTagsPackage)
         } catch (e: Exception) {
             if (tagsPackage != null) {
                 ResponseEntityManager.get(ErrorStatus.UNABLE_TO_SAVE_TAGS)

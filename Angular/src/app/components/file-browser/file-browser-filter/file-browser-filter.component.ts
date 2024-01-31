@@ -45,7 +45,9 @@ export class FileBrowserFilterComponent {
 
   // On click the clear button
   onClickClearButton() {
-    this.fileBrowserService.filterFileName = '';
-    this.fileBrowserService.updateDesktopFiles();
+    if (this.fileBrowserService.filterFileName) {
+      this.fileBrowserService.filterFileName = '';
+      this.fileBrowserService.updateDesktopFiles();
+    }
   }
 }

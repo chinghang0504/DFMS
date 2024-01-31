@@ -5,8 +5,8 @@ import com.google.gson.annotations.SerializedName
 data class SavingPackage(
 
     @SerializedName("Settings")
-    var settingsPackage: SettingsPackage = SettingsPackage(),
+    val settingsPackage: SettingsPackage = SettingsPackage(),
 
     @SerializedName("Tags")
-    var tagsPackage: TagsPackage = TagsPackage()
+    val tagsPackage: TagsPackage = TagsPackage()
 ): CommunicationPackage()

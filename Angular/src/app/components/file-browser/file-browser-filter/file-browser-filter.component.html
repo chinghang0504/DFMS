@@ -10,7 +10,7 @@
 
     @if (fileBrowserService.enableFilter) {
     <div class="mb-2">
-        <label class="h6">File type</label>
+        <label class="h6">File types</label>
         <div>
             <button class="btn mx-1 rounded-pill"
                 [ngClass]="{ 'btn-outline-warning': !fileBrowserService.fileterIsFile, 'btn-warning': fileBrowserService.fileterIsFile }"
@@ -34,11 +34,10 @@
                 </button>
             </div>
         </div>
-
     </div>
 
     <div class="mb-2">
-        <label class="h6">File Tags</label>
+        <label class="h6">File tags</label>
         @if (tagsService.isTagsEmpty) {
         <p>There are no tags in the system.</p>
         } @else {

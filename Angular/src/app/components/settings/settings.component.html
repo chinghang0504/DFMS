@@ -3,23 +3,44 @@
 <app-loading></app-loading>
 
 @if (loadingService.isRunning) {
-<div class="form-group mb-4">
+<div class="form-group mb-5">
+    <h5 class="my-3">File Browser Settings</h5>
     <div class="mb-3">
-        <label class="mb-1" for="homeFolderPath">Home Folder</label>
+        <label class="mb-1" for="homeFolderPath">Home folder</label>
         <input type="text" class="form-control" id="homeFolderPath"
             [(ngModel)]="settingsService.settingsPackage.homeFolderPath" (change)="onChangeSettings()">
     </div>
 
+    <div class="mb-3">
+        <label class="mb-1" for="filesPerPage">Files per page</label>
+        <div class="row">
+            <div class="col-md-1">
+                <select class="form-select" aria-label="Default select"
+                    [(ngModel)]="settingsService.settingsPackage.filesPerPage" (change)="onChangeSettings()">
+                    <option [value]="25">25</option>
+                    <option [value]="50">50</option>
+                    <option [value]="100">100</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="form-group mb-5">
+    <h5 class="my-3">File Settings</h5>
     <div class="form-check form-switch mb-3">
         <input class="form-check-input" type="checkbox" role="switch" id="showHidden"
             [(ngModel)]="settingsService.settingsPackage.showHidden" (change)="onChangeSettings()">
-        <label for="showHidden">Show Hidden Files</label>
+        <label for="showHidden">Show hidden files</label>
     </div>
+</div>
 
+<div class="form-group mb-5">
+    <h5 class="my-3">Tag Settings</h5>
     <div class="form-check form-switch mb-3">
         <input class="form-check-input" type="checkbox" role="switch" id="tagRemovalDoubleConfirmation"
             [(ngModel)]="settingsService.settingsPackage.tagRemovalDoubleConfirmation" (change)="onChangeSettings()">
-        <label for="tagRemovalDoubleConfirmation">Tag Removal Double Confirmation</label>
+        <label for="tagRemovalDoubleConfirmation">Tag removal double confirmation</label>
     </div>
 </div>
 

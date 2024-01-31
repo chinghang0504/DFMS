@@ -9,17 +9,15 @@ import javax.swing.SwingConstants
 
 class UserInterface {
 
-    val frame: JFrame
-    val titleLabel: JLabel
+    private val frame: JFrame = JFrame(PROJECT_NAME)
+    private val titleLabel: JLabel = JLabel(PROJECT_NAME, SwingConstants.CENTER)
 
-    // Constructor
-    constructor() {
-        frame = JFrame(PROJECT_NAME)
+    // Init
+    init {
         frame.setSize(300, 200)
         frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
         frame.isVisible = true
 
-        titleLabel = JLabel(PROJECT_NAME, SwingConstants.CENTER)
         titleLabel.setFont(Font(null, Font.PLAIN, 28))
         frame.add(titleLabel, BorderLayout.CENTER)
     }

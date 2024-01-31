@@ -11,7 +11,7 @@ import com.example.spring.services.DataService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.CrossOrigin
-import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
@@ -25,7 +25,7 @@ class DataModifyRestController {
     private lateinit var dataService: DataService
 
     // Http modify the tags of a desktop file
-    @PostMapping(MODIFY_DESKTOP_FILE_TAGS_URL)
+    @PatchMapping(MODIFY_DESKTOP_FILE_TAGS_URL)
     fun httpModifyDesktopFileTags(@RequestParam path: String, @RequestBody tagsPackage: TagsPackage): ResponseEntity<out CommunicationPackage> {
         val file: File = File(path)
 

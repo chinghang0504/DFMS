@@ -58,8 +58,6 @@ export class FileBrowserService {
   private _folderList: DesktopFile[] = [];
   private _fileList: DesktopFile[] = [];
 
-  private readonly _desktopFilesPerPage: number = 100;
-
   // Injection
   constructor(
     private loadingService: LoadingService, private communicationService: CommunicationService,
@@ -225,8 +223,8 @@ export class FileBrowserService {
   extractDesktopFilesPortion() {
     if (this._desktopFiles.length > 0) {
       this.currentPageNumber = 1;
-      this.totalPageNumber = Math.ceil(this._desktopFiles.length / this._desktopFilesPerPage);
-      this.desktopFilesPortion = this._desktopFiles.slice(0, this._desktopFilesPerPage);
+      this.totalPageNumber = Math.ceil(this._desktopFiles.length / this.settingsService.originalSettingsPackage.filesPerPage);
+      this.desktopFilesPortion = this._desktopFiles.slice(0, this.settingsService.originalSettingsPackage.filesPerPage);
     } else {
       this.currentPageNumber = 0;
       this.totalPageNumber = 0;
@@ -246,7 +244,7 @@ export class FileBrowserService {
       this.currentPageNumber = pageNumber;
     }
 
-    const endIndex: number = this.currentPageNumber * this._desktopFilesPerPage;
-    this.desktopFilesPortion = this._desktopFiles.slice(endIndex - this._desktopFilesPerPage, endIndex);
+    const endIndex: number = this.currentPageNumber * this.settingsService.originalSettingsPackage.filesPerPage;
+    this.desktopFilesPortion = this._desktopFiles.slice(endIndex - this.settingsService.originalSettingsPackage.filesPerPage, endIndex);
   }
 }
