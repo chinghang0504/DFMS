@@ -8,6 +8,6 @@ import { Component } from '@angular/core';
 export class AboutComponent {
 
   // Public data
-  version: string = '';
-  releaseDate: string = '';
+  version: string = '1.0.1';
+  releaseDate: string = '2024/01/31';
 }
